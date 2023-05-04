@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en" class="no-js">
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Iowa CO2 Pipelines</title>
+
+  <!-- link to Montserrat font -->
+  <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+
+  <!-- leaflet css -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin="" />
+
+  <!-- custom style here -->
+  <style type="text/css">
+    body,
+    html {
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Set map parameters */
+    #map {
+      position: fixed;
+      bottom: 0px;
+      width: 100%;
+      top: 52px;
+    }
+
+    header {
+      position: fixed;
+      top: 0px;
+      width: 100%;
+      height: 52px;
+      background-color: #000000;
+      box-shadow: 0px 0px 5px black;
+      z-index: 800;
+    }
+
+    h1 {
+      color: white;
+      font-size: 16px;
+      display: inline-block;
+      margin-top: 0.5em;
+      margin-bottom: 0.0em;
+      margin-left: 0.8em;
+      margin-right: 0;
+      font-weight: normal;
+      font-family: "Montserrat";
+    }
+
+    h2 {
+      font-size: 12px;
+      color: white;
+      display: inline-block;
+      margin-top: 0.25em;
+      margin-bottom: 0.0em;
+      margin-left: 1.0em;
+      margin-right: 0;
+      font-weight: normal;
+      font-family: "Montserrat";
+    }
+
+    .legend,
+    .caseLegend {
+      padding: 6px 8px;
+      font-size: 1em;
+      background: rgba(75, 75, 75, 0.8);
+      color: whitesmoke;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+      border-radius: 5px;
+      width: 160px;
+    }
+
+    .legend h3,
+    .caseLegend h3 {
+      font-size: 1.1em;
+      font-weight: bold;
+      line-height: 1em;
+      color: whitesmoke;
+      margin: 0;
+    }
+
+    .legend h3 span,
+    .caseLegend h3 span {
+      font-size: 1.1em;
+      margin: 0 30px 0 0;
+    }
+
+    .legend ul,
+    .caseLegend ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 12px 4px 0;
+    }
+
+    .legend li,
+    .caseLegend li {
+      height: 22px;
+    }
+
+    .legend span,
+    .caseLegend span {
+      width: 30px;
+      height: 20px;
+      float: left;
+      margin-right: 10px;
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+  <header>
+    <h1>Iowa CO2 Pipelines</h1><br>
+    <h2>Digital Scholarship & Publishing Studio, University of Iowa Libraries</h2>
+  </header>
+
+  <!-- map -->
+  <div id="map"></div>
+
+  <!-- leaflet js -->
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
+  <!-- d3js -->
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+  <!-- chroma -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/1.2.1/chroma.min.js"></script>
+
+  <!-- javascript below -->
+  <script>
+    // initialize the map
+    const map = L.map('map');
+
+    // add a basemap
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+      subdomains: 'abcd',
+      maxZoom: 11,
+      minZoom: 7
+    }).addTo(map);
+
+    // Add a scale bar
+    L.control.scale({
+      position: 'bottomleft'
+    }).addTo(map);
+
+    // Load the data asynchronously
+    d3.queue()
+      .defer(d3.json, 'data/iowa-counties.geojson') //the Iowa Counties geojson file
+      .defer(d3.json, 'data/Navigator_CO2_Pipeline.geojson') //Navigator Pipeline
+      .defer(d3.json, 'data/Summit_CO2_Pipeline.geojson') //Summit Pipeline
+      .defer(d3.json, 'data/Wolf_CO2_Pipeline.geojson') //Wolf Pipeline
+      .await(drawMap); //load the layers after the map loads
+
+    // Provide instructions for making the map
+    function drawMap(err, counties, nav, summit, wolf) {
+
+      // create Leaflet object with geometry data and add to map
+      const iowaCounties = L.geoJson(counties, {
+        style: function(feature) {
+          return {
+            color: 'black',
+            weight: 1,
+            fillOpacity: 1,
+            fillColor: '#1f78b4'
+          };
+        }
+      }).addTo(map);
+
+      const navigatorPipeline = L.geoJson(nav, {
+        style: function(feature) {
+          return {
+            color: 'red',
+            weight: 1
+          };
+        }
+      }).addTo(map);
+
+      const summitPipeline = L.geoJson(summit, {
+        style: function(feature) {
+          return {
+            color: 'orange',
+            weight: 1
+          };
+        }
+      }).addTo(map);
+
+      const wolfPipeline = L.geoJson(wolf, {
+        style: function(feature) {
+          return {
+            color: 'yellow',
+            weight: 1
+          };
+        }
+      }).addTo(map);
+
+      // first set the zoom/center to the dataLayer's extent
+      map.fitBounds(iowaCounties.getBounds());
+
+    } // end drawMap function
+
+  </script>
+
+</body>
+
+</html>
