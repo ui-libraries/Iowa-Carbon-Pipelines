@@ -165,12 +165,40 @@
       // create Leaflet object with geometry data and add to map
       const iowaCounties = L.geoJson(counties, {
         style: function(feature) {
-          return {
-            color: 'black',
-            weight: 1,
-            fillOpacity: 1,
-            fillColor: '#1f78b4'
-          };
+          const pipelineStatus = feature.properties.pipeline;
+          if (pipelineStatus == 'yes') {
+            return {
+              color: 'black',
+              weight: 1,
+              fillOpacity: 0.5,
+              fillColor: 'rgb(135,206,235)'
+            };
+          } else {
+            return {
+              color: 'black',
+              weight: 1,
+              fillOpacity: 0.5,
+              fillColor: 	'rgb(211,211,211)'
+            };
+          }
+        },
+        onEachFeature: function(feature, layer) {
+          // define the layer properties
+          const props = layer.feature.properties;
+          // bind a tooltip to the layer
+          layer.bindTooltip('<b>'+props.name+'</b>');
+          //define what happens on mouseover
+          layer.on("mouseover", function(e) {
+            e.target.setStyle({
+              fillOpacity: 0.8
+            });
+          });
+          //define what happens on mouseout
+          layer.on("mouseout", function(e) {
+            e.target.setStyle({
+              fillOpacity: 0.5
+            });
+          });             
         }
       }).addTo(map);
 
@@ -178,8 +206,28 @@
         style: function(feature) {
           return {
             color: 'red',
-            weight: 1
+            weight: 2
           };
+        },
+        onEachFeature: function(feature, layer) {
+          // define the layer properties
+          const props = layer.feature.properties;
+          // bind a tooltip to the layer 
+          layer.bindTooltip('<b>'+props.Name+'</b>', { sticky: true }).openTooltip();
+          //define what happens on mouseover
+          layer.on("mouseover", function(e) {
+            e.target.setStyle({
+              color: 'yellow',
+              weight: 3
+            });
+          }); 
+          //define what happens on mouseout
+          layer.on("mouseout", function(e) {
+            e.target.setStyle({
+              color: 'red',
+              weight: 2
+            });
+          });                   
         }
       }).addTo(map);
 
@@ -189,15 +237,55 @@
             color: 'orange',
             weight: 1
           };
+        },
+        onEachFeature: function(feature, layer) {
+          // define the layer properties
+          const props = layer.feature.properties;
+          // bind a tooltip to the layer 
+          layer.bindTooltip('<b>'+props.Name+'</b>', { sticky: true }).openTooltip();
+          //define what happens on mouseover
+          layer.on("mouseover", function(e) {
+            e.target.setStyle({
+              color: 'yellow',
+              weight: 3
+            });
+          }); 
+          //define what happens on mouseout
+          layer.on("mouseout", function(e) {
+            e.target.setStyle({
+              color: 'orange',
+              weight: 2
+            });
+          });                   
         }
       }).addTo(map);
 
       const wolfPipeline = L.geoJson(wolf, {
         style: function(feature) {
           return {
-            color: 'yellow',
+            color: 'green',
             weight: 1
           };
+        },
+        onEachFeature: function(feature, layer) {
+          // define the layer properties
+          const props = layer.feature.properties;
+          // bind a tooltip to the layer 
+          layer.bindTooltip('<b>Wolf Carbon Pipeline</b>', { sticky: true }).openTooltip();
+          //define what happens on mouseover
+          layer.on("mouseover", function(e) {
+            e.target.setStyle({
+              color: 'yellow',
+              weight: 3
+            });
+          }); 
+          //define what happens on mouseout
+          layer.on("mouseout", function(e) {
+            e.target.setStyle({
+              color: 'green',
+              weight: 2
+            });
+          });                   
         }
       }).addTo(map);
 
