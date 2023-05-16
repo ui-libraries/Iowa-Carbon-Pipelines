@@ -82,7 +82,8 @@
       color: whitesmoke;
       box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
       border-radius: 5px;
-      width: 180px;
+      width: auto !important;
+      white-space: nowrap;
     }
 /*
     .legend h3,
@@ -181,7 +182,7 @@
 
     // Add the legend to the map
     legend.onAdd = function (map) {
-        var div = L.DomUtil.create('div', 'legend');
+        const div = L.DomUtil.create('div', 'legend');
         div.innerHTML += '<h4>Legend</h4>';
         div.innerHTML += '<h5>Pipelines</h5>';
         div.innerHTML += '<svg height="12" width="12"><line x1="0" y1="6" x2="12" y2="6" style="stroke:red; stroke-width:2" /></svg> Navigator<br>';
@@ -195,10 +196,6 @@
 
     // Add the legend control to the map
     legend.addTo(map);
-    
-    // Adjust the CSS styles of the legend
-    const legendContainer = document.querySelector('.legend');
-    //legendContainer.style.paddingTop = '0px';
 
     // Load the data asynchronously
     d3.queue()
