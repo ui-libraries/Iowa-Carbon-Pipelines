@@ -64,6 +64,16 @@
       font-family: "Montserrat";
     }
 
+    h4 {
+      font-size: 16px;
+      margin: 4px;
+    }
+
+    h5 {
+      font-size: 13px;
+      margin: 4px;
+    }
+
     .legend,
     .caseLegend {
       padding: 6px 8px;
@@ -72,9 +82,9 @@
       color: whitesmoke;
       box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
       border-radius: 5px;
-      width: 160px;
+      width: 180px;
     }
-
+/*
     .legend h3,
     .caseLegend h3 {
       font-size: 1.1em;
@@ -108,6 +118,21 @@
       height: 20px;
       float: left;
       margin-right: 10px;
+    }
+*/
+    .legend .square {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      margin-right: 5px;
+    }
+
+    .legend .square.present {
+      background-color: rgba(135, 206, 235, 0.5);
+    }
+
+    .legend .square.not-present {
+      background-color: rgba(211, 211, 211, 0.5);
     }
 
   </style>
@@ -150,6 +175,30 @@
     L.control.scale({
       position: 'bottomleft'
     }).addTo(map);
+
+    // Create a legend control
+    const legend = L.control({ position: 'bottomright' });
+
+    // Add the legend to the map
+    legend.onAdd = function (map) {
+        var div = L.DomUtil.create('div', 'legend');
+        div.innerHTML += '<h4>Legend</h4>';
+        div.innerHTML += '<h5>Pipelines</h5>';
+        div.innerHTML += '<svg height="12" width="12"><line x1="0" y1="6" x2="12" y2="6" style="stroke:red; stroke-width:2" /></svg> Navigator<br>';
+        div.innerHTML += '<svg height="12" width="12"><line x1="0" y1="6" x2="12" y2="6" style="stroke:orange; stroke-width:2" /></svg> Midwest<br>';
+        div.innerHTML += '<svg height="12" width="12"><line x1="0" y1="6" x2="12" y2="6" style="stroke:green; stroke-width:2" /></svg> Wolf<br>';
+        div.innerHTML += '<h5>Counties</h5>';
+        div.innerHTML += '<div class="square" style="background-color: rgba(135,206,235,0.5);"></div> Planned Pipeline Present<br>';
+        div.innerHTML += '<div class="square" style="background-color: rgba(211,211,211,0.5);"></div> Planned Pipeline Not Present<br>';
+        return div;
+    };
+
+    // Add the legend control to the map
+    legend.addTo(map);
+    
+    // Adjust the CSS styles of the legend
+    const legendContainer = document.querySelector('.legend');
+    //legendContainer.style.paddingTop = '0px';
 
     // Load the data asynchronously
     d3.queue()
@@ -235,7 +284,7 @@
         style: function(feature) {
           return {
             color: 'orange',
-            weight: 1
+            weight: 2
           };
         },
         onEachFeature: function(feature, layer) {
@@ -264,7 +313,7 @@
         style: function(feature) {
           return {
             color: 'green',
-            weight: 1
+            weight: 2
           };
         },
         onEachFeature: function(feature, layer) {
