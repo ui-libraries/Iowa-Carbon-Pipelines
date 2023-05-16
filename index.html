@@ -354,7 +354,14 @@
 
 
       // Add the layer control to the map
-      L.control.groupedLayers(null, groupedOverlays, { position: 'topright', collapsed: false }).addTo(map);
+      L.control.groupedLayers(null, groupedOverlays, { position: 'topright', collapsed: false, exclusiveGroups: ["Counties"] }).addTo(map);
+
+      // Event listener for the overlayadd event
+      map.on('overlayadd', function (eventLayer) {
+        if (eventLayer.layer === iowaCounties) {
+          iowaCounties.bringToBack();
+        }
+      });
 
     } // end drawMap function
 
