@@ -13,7 +13,6 @@
 
   <!-- leaflet css -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin="" />
-  <link rel="stylesheet" href="src/leaflet.groupedlayercontrol.css" />
 
   <!-- custom style here -->
   <style type="text/css">
@@ -83,8 +82,7 @@
       color: whitesmoke;
       box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
       border-radius: 5px;
-      width: auto !important;
-      white-space: nowrap;
+      width: 180px;
     }
 /*
     .legend h3,
@@ -159,7 +157,6 @@
   <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
   <!-- chroma -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/1.2.1/chroma.min.js"></script>
-  <script src="src/leaflet.groupedlayercontrol.js"></script>
 
   <!-- javascript below -->
   <script>
@@ -170,7 +167,7 @@
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
       subdomains: 'abcd',
-      maxZoom: 15,
+      maxZoom: 11,
       minZoom: 7
     }).addTo(map);
 
@@ -184,7 +181,7 @@
 
     // Add the legend to the map
     legend.onAdd = function (map) {
-        const div = L.DomUtil.create('div', 'legend');
+        var div = L.DomUtil.create('div', 'legend');
         div.innerHTML += '<h4>Legend</h4>';
         div.innerHTML += '<h5>Pipelines</h5>';
         div.innerHTML += '<svg height="12" width="12"><line x1="0" y1="6" x2="12" y2="6" style="stroke:red; stroke-width:2" /></svg> Navigator<br>';
@@ -192,42 +189,58 @@
         div.innerHTML += '<svg height="12" width="12"><line x1="0" y1="6" x2="12" y2="6" style="stroke:green; stroke-width:2" /></svg> Wolf<br>';
         div.innerHTML += '<h5>Counties</h5>';
         div.innerHTML += '<div class="square" style="background-color: rgba(135,206,235,0.5);"></div> Planned Pipeline Present<br>';
-        div.innerHTML += '<div class="square" style="background-color: rgba(211,211,211,0.5);"></div> Planned Pipeline Not Present<br>';
+        div.innerHTML += '<div class="square" style="background-color: rgba(201,190,119,0.5);"></div> Pipeline Ordinance Enacted<br>';
         return div;
     };
 
     // Add the legend control to the map
     legend.addTo(map);
 
+    // Adjust the CSS styles of the legend
+    const legendContainer = document.querySelector('.legend');
+    //legendContainer.style.paddingTop = '0px';
+
     // Load the data asynchronously
     d3.queue()
       .defer(d3.json, 'data/iowa-counties.geojson') //the Iowa Counties geojson file
+      .defer(d3.json, 'data/pipeline-ordinances.geojson') //the county pipeline ordinances
       .defer(d3.json, 'data/Navigator_CO2_Pipeline.geojson') //Navigator Pipeline
       .defer(d3.json, 'data/Summit_CO2_Pipeline.geojson') //Summit Pipeline
       .defer(d3.json, 'data/Wolf_CO2_Pipeline.geojson') //Wolf Pipeline
       .await(drawMap); //load the layers after the map loads
 
     // Provide instructions for making the map
-    function drawMap(err, counties, nav, summit, wolf) {
+    function drawMap(err, counties, ords, nav, summit, wolf) {
 
       // create Leaflet object with geometry data and add to map
       const iowaCounties = L.geoJson(counties, {
         style: function(feature) {
-          const pipelineStatus = feature.properties.pipeline;
-          if (pipelineStatus == 'yes') {
             return {
               color: 'black',
               weight: 1,
-              fillOpacity: 0.5,
-              fillColor: 'rgb(135,206,235)'
+              fillOpacity: 0
             };
-          } else {
-            return {
-              color: 'black',
-              weight: 1,
-              fillOpacity: 0.5,
-              fillColor: 	'rgb(211,211,211)'
-            };
+        },
+        onEachFeature: function(feature, layer) {
+          // define the layer properties
+          const props = layer.feature.properties;
+          // bind a tooltip to the layer
+          layer.bindTooltip('<b>'+props.name+'</b>');
+        }
+      }).addTo(map);
+
+      // create Leaflet object with geometry data and add to map
+      const pipelineCounties = L.geoJson(counties, {
+        // Function to filter results based on "pipeline" property
+        filter: function(feature) {
+          return feature.properties.pipeline === "yes";
+        },
+        style: function(feature, layer) {
+          return {
+            color: 'black',
+            weight: 1,
+            fillOpacity: 0.5,
+            fillColor: 'rgb(135,206,235)'
           }
         },
         onEachFeature: function(feature, layer) {
@@ -235,20 +248,48 @@
           const props = layer.feature.properties;
           // bind a tooltip to the layer
           layer.bindTooltip('<b>'+props.name+'</b>');
-          //define what happens on mouseover
-          layer.on("mouseover", function(e) {
-            e.target.setStyle({
-              fillOpacity: 0.8
-            });
-          });
-          //define what happens on mouseout
-          layer.on("mouseout", function(e) {
-            e.target.setStyle({
-              fillOpacity: 0.5
-            });
-          });             
         }
-      }).addTo(map);
+      });
+
+      // create Leaflet object with geometry data and add to map
+      const ordinances = L.geoJson(ords, {
+        // Function to filter features based on "ordinance" property
+        filter: function(feature) {
+          return feature.properties.ordinance === "yes";
+        },
+        style: function(feature, layer) {
+          return {
+            color: 'black',
+            weight: 1,
+            fillOpacity: 0.5,
+            fillColor: 'rgb(201,190,119)'
+          }
+        },
+        onEachFeature: function(feature, layer) {
+          // define the layer properties
+          const props = layer.feature.properties;
+          // bind a tooltip to the layer
+          layer.bindTooltip('<b>'+props.name+'</b><br>Click this county for details about the ordinance.');
+
+          if (props.url && props.url2) {
+            // If both "url" and "url2" properties exist, add a click event listener to the layer
+            layer.on('click', function () {
+              const url = props.url;
+              const url2 = props.url2;
+              window.open(url, '_blank');
+              setTimeout(function () {
+                window.open(url2, '_blank');
+              }, 100);
+            });
+          } else if (props.url && !props.url2) {
+            // If only "url" property exists, add a click event listener to the layer
+            layer.on('click', function () {
+              const url = props.url;
+              window.open(url, '_blank');
+            });
+          }
+        }
+      });
 
       const navigatorPipeline = L.geoJson(nav, {
         style: function(feature) {
@@ -257,10 +298,11 @@
             weight: 2
           };
         },
+/*
         onEachFeature: function(feature, layer) {
           // define the layer properties
           const props = layer.feature.properties;
-          // bind a tooltip to the layer 
+          // bind a tooltip to the layer
           layer.bindTooltip('<b>'+props.Name+'</b>', { sticky: true }).openTooltip();
           //define what happens on mouseover
           layer.on("mouseover", function(e) {
@@ -268,15 +310,16 @@
               color: 'yellow',
               weight: 3
             });
-          }); 
+          });
           //define what happens on mouseout
           layer.on("mouseout", function(e) {
             e.target.setStyle({
               color: 'red',
               weight: 2
             });
-          });                   
+          });
         }
+*/        
       }).addTo(map);
 
       const summitPipeline = L.geoJson(summit, {
@@ -286,10 +329,11 @@
             weight: 2
           };
         },
+/*
         onEachFeature: function(feature, layer) {
           // define the layer properties
           const props = layer.feature.properties;
-          // bind a tooltip to the layer 
+          // bind a tooltip to the layer
           layer.bindTooltip('<b>'+props.Name+'</b>', { sticky: true }).openTooltip();
           //define what happens on mouseover
           layer.on("mouseover", function(e) {
@@ -297,15 +341,16 @@
               color: 'yellow',
               weight: 3
             });
-          }); 
+          });
           //define what happens on mouseout
           layer.on("mouseout", function(e) {
             e.target.setStyle({
               color: 'orange',
               weight: 2
             });
-          });                   
+          });
         }
+*/
       }).addTo(map);
 
       const wolfPipeline = L.geoJson(wolf, {
@@ -315,10 +360,11 @@
             weight: 2
           };
         },
+/*
         onEachFeature: function(feature, layer) {
           // define the layer properties
           const props = layer.feature.properties;
-          // bind a tooltip to the layer 
+          // bind a tooltip to the layer
           layer.bindTooltip('<b>Wolf Carbon Pipeline</b>', { sticky: true }).openTooltip();
           //define what happens on mouseover
           layer.on("mouseover", function(e) {
@@ -326,41 +372,35 @@
               color: 'yellow',
               weight: 3
             });
-          }); 
+          });
           //define what happens on mouseout
           layer.on("mouseout", function(e) {
             e.target.setStyle({
               color: 'green',
               weight: 2
             });
-          });                   
+          });
         }
+*/
       }).addTo(map);
 
       // first set the zoom/center to the dataLayer's extent
       map.fitBounds(iowaCounties.getBounds());
 
-      // Create an object with the overlay layers
-      const groupedOverlays = {
-        'Pipelines': {
-          'Navigator': navigatorPipeline,
-          'Summit': summitPipeline,
-          'Wolf': wolfPipeline
-        },
-        'Counties': {
-          'Iowa Counties': iowaCounties
-        }
+      // Create an object to hold the layers for the layer control
+      const exclusiveLayers = {
+        "Planned Pipeline Present": pipelineCounties,
+        "Pipeline Ordinance Enacted": ordinances,
       };
 
-
       // Add the layer control to the map
-      L.control.groupedLayers(null, groupedOverlays, { position: 'topright', collapsed: false/*, exclusiveGroups: ["Counties"]*/ }).addTo(map);
+      L.control.layers(exclusiveLayers, null, { collapsed: false }).addTo(map);
 
-      // Event listener for the overlayadd event
-      map.on('overlayadd', function (eventLayer) {
-        if (eventLayer.layer === iowaCounties) {
-          iowaCounties.bringToBack();
-        }
+      // Bring the pipelines to the front whenever the counties layers are changed
+      map.on('layeradd', function(eventLayer) {
+        navigatorPipeline.bringToFront();
+        summitPipeline.bringToFront();
+        wolfPipeline.bringToFront();
       });
 
     } // end drawMap function
