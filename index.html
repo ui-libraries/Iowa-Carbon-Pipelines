@@ -2,7 +2,6 @@
 <html lang="en" class="no-js">
 
 <head>
-
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -14,13 +13,18 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin="" />
   <!-- grouped layer control -->
   <link rel="stylesheet" href="src/leaflet.groupedlayercontrol.css" />
+  <!-- for the collapsible sidebar -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" />
+  <link rel="stylesheet" href="src/leaflet-sidebar.css" />
 
   <!-- custom style here -->
   <style type="text/css">
+
     body,
     html {
       margin: 0;
       padding: 0;
+      font: 10pt "Helvetica Neue", Arial, Helvetica, sans-serif;
     }
 
     /* Set map parameters */
@@ -28,9 +32,10 @@
       position: fixed;
       bottom: 0px;
       width: 100%;
-      top: 52px;
+      top: 0px;
     }
 
+/*
     header {
       position: fixed;
       top: 0px;
@@ -40,7 +45,7 @@
       box-shadow: 0px 0px 5px black;
       z-index: 800;
     }
-
+*/
     h1 {
       color: white;
       font-size: 16px;
@@ -136,16 +141,76 @@
     .legend .square.not-present {
       background-color: rgba(211, 211, 211, 0.5);
     }
+
+    /* custom sidebar css */
+      /* sidebar header */
+      .sidebar-header {
+        width: 100%;
+      }
+
+      /* sidebar icon */
+      i {
+        color: rgb(0, 0, 0);
+      }
+
+      /* sidebar about heading*/
+      .about {
+        color: rgb(0, 0, 0);
+        font-size: 16px;
+        margin-bottom: 0px;
+        margin-top: 0px;
+        margin-left: 0px;
+      }
+
+      /* map info */
+      .details {
+        font-size: 14px;
+        font-weight: normal;
+        margin-bottom: 0px;
+        margin-top: 0px;
+      }
+
+      .introbreak {
+        display: block;
+        margin-bottom: 1em;
+      }
+
   </style>
 
 </head>
 
 <body>
-
+<!--
   <header>
     <h1>Iowa CO2 Pipelines</h1><br>
     <h2>Digital Scholarship & Publishing Studio, University of Iowa Libraries</h2>
   </header>
+-->
+  <div id="sidebar" class="sidebar collapsed">
+    <div class="sidebar-tabs">
+      <ul role="tablist">
+        <li><a href="#home" role="tab"><i class="fa fa-bars"></i></a></li>
+      </ul>
+    </div>
+    <div class="sidebar-content">
+      <div class="sidebar-pane" id="home">
+        <h1 class="sidebar-header">Iowa Carbon Pipelines<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1><br>
+        <div><br><b>
+          <h2 class="about">About This Project</h2>
+        </b><br><br>
+          <h3 class="details">This map is meant to help its users locate counties in Iowa that are impacted by planned carbon pipeline construction and pipeline-related ordinances. The initial map layer displays the counties in Iowa where carbon pipelines are planned for construction. Basic instructions are as follows:<br><br>1.) In the upper right corner, you can use the layer control to filter the planned pipelines by company (Navigator, Midwest, and Wolf).<br>2.) You can also use this to switch to the layer showing which counties have enacted pipeline-related ordinances.<br>3.) With this layer on, you can click counties with ordinances on the map to open ordinance-related documents in new web browser tabs.<br>4.) You can collapse this sidebar by clicking the arrow icon in its upper right corner.<br><br>This application was developed by the <a href="https://www.lib.uiowa.edu/studio/" target="_blank">University of Iowa Libraries' Digital Scholarship & Publishing Studio</a>. The locations of the planned pipelines were painstakingly digitized by researchers at the FracTracker Alliance and appear here courtesy of <a href="https://www.fractracker.org/author/ted-auch/" target="_blank">Dr. Ted Auch, the Midwest Program Director of the FracTracker Alliance</a>.</h3>
+          <p style="padding-bottom:0px"></p>
+        </div>
+        <div id="dropdown-instructions">
+          <p><b>Choose from the options in the dropdown menu to find your county of interest.</b></p>
+        </div>
+        <form id="map_parameters" name="map_parameters" action="#" accept-charset="utf-8" class="inlineForm"><select id="chapter-select" class="div-toggle" data-target=".my-info-1"></select></form><span class='introbreak'></span>
+        <div id="sidebar-info" class="my-info-1">
+          <div id="content-info" class="contentinfo hide"></div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- map -->
   <div id="map"></div>
@@ -160,11 +225,26 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/1.2.1/chroma.min.js"></script>
   <!-- grouped layer control -->
   <script src="src/leaflet.groupedlayercontrol.js"></script>
-
+  <!-- sidebar -->
+  <script src="https://cdn.jsdelivr.net/gh/jebowe3/CSV-2-Storymap/js/svg-icon.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/jebowe3/CSV-2-Storymap/js/leaflet-sidebar.js"></script>
   <!-- javascript below -->
   <script>
     // initialize the map
     const map = L.map('map');
+
+    // add a sidebar to the map
+    const sidebar = L.control.sidebar("sidebar").addTo(map);
+    sidebar.open("home");
+
+    // define an empty array to hold the sidebar selected content
+    const chapterContent = [];
+    // define an empty array to hold the selected county
+    const chapterSelected = [];
+    // define sidebar info
+    const info = document.getElementById("content-info");
+    // define an empty array to hold the counties
+    const chapterNames = [];
 
     // add a basemap
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
@@ -231,6 +311,16 @@
           const props = layer.feature.properties;
           // bind a tooltip to the layer
           layer.bindTooltip('<b>' + props.name + '</b>');
+          // push the county names to the chapterNames array
+          chapterNames.push(props.county);
+          // sort the counties alphabetically
+          chapterNames.sort();
+          // define the dropdown content using each county name
+          const eachChapter = chapterNames.filter((v, i, a) => a.indexOf(v) === i);
+          let tmpHTML = '<select><option value="0">Select a county</option>';
+          for (let csv = 0; csv < eachChapter.length; csv++) tmpHTML += '<option value="' + eachChapter[csv] + '">' + eachChapter[csv] + '</option>';
+          tmpHTML += '</select>';
+          document.getElementById("chapter-select").innerHTML = tmpHTML;
         }
       }).addTo(map);
 
@@ -418,7 +508,27 @@
         wolfPipeline.bringToFront();
       });
 
+      $('#chapter-select')[0].onchange = function(e) {
+        filterOrdinances(ordinances);
+      };
+
     } // end drawMap function
+
+    function filterOrdinances(ordinances) {
+      chapterContent.length = 0;
+      info.innerHTML = chapterContent.join("");
+      chapterSelected.length = 0;
+      chapterSelected.push($('#chapter-select')[0].value);
+      ordinances.eachLayer(function(layer) {
+        const props = layer.feature.properties;
+        if (chapterSelected[0] == props.county) {
+          //selectedLayers.addLayer(layer);
+          chapterContent.push("<div class='story'><h2 class='about'>" + props.name + "</h2><br><h3 class='details'>" + props.Ordinance_Hyperlinks + "</h3></div>");
+          info.innerHTML = chapterContent;
+        }
+      });
+    }
+
   </script>
 
 </body>
