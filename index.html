@@ -254,15 +254,18 @@
       minZoom: 7
     }).addTo(map);
 
-    // Add a scale bar
-    L.control.scale({
-      position: 'bottomleft'
-    }).addTo(map);
+    // Remove the default zoom control 
+    map.zoomControl.remove();
 
     // Create a legend control
     const legend = L.control({
       position: 'bottomright'
     });
+
+    // Add a scale bar
+    L.control.scale({
+      position: 'bottomright'
+    }).addTo(map);
 
     // Add the legend to the map
     legend.onAdd = function(map) {
