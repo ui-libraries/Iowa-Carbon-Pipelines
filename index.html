@@ -239,6 +239,8 @@
 
     // define an empty array to hold the sidebar selected content
     const chapterContent = [];
+    // define an empty array to hold all counties with an ordinance
+    const ordinanceCounties = [];
     // define an empty array to hold the selected county
     const chapterSelected = [];
     // define sidebar info
@@ -254,7 +256,7 @@
       minZoom: 7
     }).addTo(map);
 
-    // Remove the default zoom control 
+    // Remove the default zoom control
     map.zoomControl.remove();
 
     // Create a legend control
@@ -519,17 +521,23 @@
 
     function filterOrdinances(ordinances) {
       chapterContent.length = 0;
+      ordinanceCounties.length = 0;
       info.innerHTML = chapterContent.join("");
       chapterSelected.length = 0;
       chapterSelected.push($('#chapter-select')[0].value);
       ordinances.eachLayer(function(layer) {
         const props = layer.feature.properties;
+        ordinanceCounties.push(props.county);
         if (chapterSelected[0] == props.county) {
           //selectedLayers.addLayer(layer);
           chapterContent.push("<div class='story'><h2 class='about'>" + props.name + "</h2><br><h3 class='details'>" + props.Ordinance_Hyperlinks + "</h3></div>");
           info.innerHTML = chapterContent;
         }
       });
+      if (ordinanceCounties.indexOf(chapterSelected[0]) === -1) {
+        chapterContent.push("<div class='story'><h2 class='about'>" + chapterSelected[0] + "</h2><br><h3 class='details'>The selected county has no ordinance.</h3></div>");
+        info.innerHTML = chapterContent;
+      };
     }
 
   </script>
