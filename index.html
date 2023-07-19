@@ -370,7 +370,6 @@
           const props = layer.feature.properties;
           // bind a tooltip to the layer
           layer.bindTooltip('<b>' + props.name + '</b><br>Click this county for details about the ordinance.');
-
           if (props.url && props.url2) {
             // If both "url" and "url2" properties exist, add a click event listener to the layer
             layer.on('click', function() {
@@ -387,7 +386,7 @@
               const url = props.url;
               window.open(url, '_blank');
             });
-          }
+          };
         }
       });
 
@@ -515,6 +514,7 @@
 
       $('#chapter-select')[0].onchange = function(e) {
         filterOrdinances(ordinances);
+        filterCounties(iowaCounties)
       };
 
     } // end drawMap function
@@ -538,7 +538,36 @@
         chapterContent.push("<div class='story'><h2 class='about'>" + chapterSelected[0] + "</h2><br><h3 class='details'>The selected county has no ordinance.</h3></div>");
         info.innerHTML = chapterContent;
       };
-    }
+    };
+
+    function filterCounties(iowaCounties) {
+      iowaCounties.eachLayer(function(layer) {
+        const props = layer.feature.properties;
+        if (chapterSelected[0] == props.county) {
+          // If chapterSelected[0] matches props.county, change the style of the layer
+          layer.setStyle({
+            weight: 5 // Set the weight to 2
+          });
+          /*layer.bringToFront();
+          layer.bindPopup('<b>' + props.name + '</b>');
+          layer.openPopup();*/
+          map.flyToBounds(layer.getBounds(), {
+            animate: true,
+            duration: 1 // You can adjust the animation duration as needed
+          });
+        } else {
+          layer.setStyle({
+            weight: 1 // Set the weight to 1
+          });
+        };
+      });
+      iowaCounties.on('mouseover', function (event) {
+        // Set the initial style on mouseout
+        iowaCounties.setStyle({
+          weight: 1 // Set the weight to 1
+        });
+      });
+    };
 
   </script>
 
