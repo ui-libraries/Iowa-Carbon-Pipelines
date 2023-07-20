@@ -487,20 +487,20 @@
       map.fitBounds(iowaCounties.getBounds());
 
       // Create an object with the overlay layers
-      const groupedOverlays = {
-        "Pipeline Layers": {
-          "Navigator": navigatorPipeline,
-          "Midwest": summitPipeline,
-          "Wolf": wolfPipeline
-        },
-        "County Layers": {
-          "Planned Pipeline Present": pipelineCounties,
-          "Pipeline Ordinance Enacted": ordinances
-        }
+      const overlayLayers = {
+        "Navigator Pipeline": navigatorPipeline,
+        "Summit Pipeline": summitPipeline,
+        "Wolf Pipeline": wolfPipeline
+      };
+
+      // Create an object with the base layers
+      const baseLayers = {
+        "Planned Pipeline Counties": pipelineCounties,
+        "Pipeline Ordinances": ordinances,
       };
 
       // Add the layer control to the map
-      const layerControl = L.control.groupedLayers(null, groupedOverlays, { position: 'topright', collapsed: false, exclusiveGroups: ["County Layers"] }).addTo(map);
+      const layerControl = L.control.layers(baseLayers, overlayLayers, { position: 'topright', collapsed: false }).addTo(map);
 
       // Prevent zooming when clicking on the layer control
       L.DomEvent.disableClickPropagation(layerControl.getContainer());
