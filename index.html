@@ -162,10 +162,17 @@
 
       /* map info */
       .details {
-        font-size: 14px;
+        font-size: 13px;
         font-weight: normal;
         margin-bottom: 0px;
         margin-top: 0px;
+      }
+
+      .instructions {
+        font-size: 12px;
+        font-weight: normal;
+        margin-bottom: 0px;
+        margin-top: 0px;        
       }
 
       .introbreak {
@@ -196,13 +203,33 @@
         <div><br><b>
           <h2 class="about">About This Project</h2>
         </b><br><br>
-          <h3 class="details">This map is meant to help its users locate counties in Iowa that are impacted by planned carbon pipeline construction and pipeline-related ordinances. The initial map layer displays the counties in Iowa where carbon pipelines are planned for construction. Basic instructions are as follows:<br><br>1.) In the upper right corner, you can use the layer control to switch to the layer showing which counties have enacted pipeline-related ordinances.<br>2.) You can also use this to filter the planned pipelines by company (Navigator, Midwest, and Wolf).<br>3.) With the ordinance layer on, you can click counties with ordinances on the map to open ordinance-related documents in new web browser tabs.<br>4.) You can also search for county ordinances using the dropdown menu in the sidebar. This will return a list of links.<br>5.) You can collapse this sidebar by clicking the arrow icon in its upper right corner.<br><br>This application was developed by the <a href="https://www.lib.uiowa.edu/studio/" target="_blank">University of Iowa Libraries' Digital Scholarship & Publishing Studio</a>. The locations of the planned pipelines were digitized by researchers at the FracTracker Alliance and appear here courtesy of <a href="https://www.fractracker.org/author/ted-auch/" target="_blank">Dr. Ted Auch, the Midwest Program Director of the FracTracker Alliance</a>.</h3>
+          <h3 class="details">This map helps users locate Iowa counties impacted by planned carbon pipeline construction, ordinances, and litigation. Basic instructions are as follows:</h3>
+            <br><h4 class="instructions">1.) In the upper right corner, use the layer control to switch to the layer showing which counties have enacted pipeline-related ordinances or litigation.
+            <br>2.) You can also use this to filter the planned pipelines by company (Navigator, Midwest, and Wolf).
+            <br>3.) With the ordinance layer on, you can click counties with ordinances on the map to open ordinance-related documents in new web browser tabs.
+            <br>4.) You can also search for county ordinances or litigation using the dropdown menu in the sidebar. This will return a list at the bottom.
+            <br>5.) You can collapse this sidebar by clicking the arrow icon in its upper right corner.</h4>
+            <br><h3 class="details">This application was developed by the <a href="https://www.lib.uiowa.edu/studio/" target="_blank">University of Iowa Libraries' Digital Scholarship & Publishing Studio</a>. The locations of the planned pipelines were digitized by researchers at the FracTracker Alliance and appear here courtesy of <a href="https://www.fractracker.org/author/ted-auch/" target="_blank">Dr. Ted Auch, the Midwest Program Director of the FracTracker Alliance</a>.</h3>
           <p style="padding-bottom:0px"></p>
         </div>
-        <div id="dropdown-instructions">
-          <p><b>Choose from the options in the dropdown menu to find your county of interest.</b></p>
+        <div id="radio-select">
+          <p><b>Choose from ordinances or litigation.</b></p>
+          <input type="radio" id="ordinances" name="select" value="ordinances" checked>
+          <label for="ordinances">Ordinances</label><br>
+
+          <input type="radio" id="litigation" name="select" value="litigation">
+          <label for="litigation">Litigation</label><br>
         </div>
-        <form id="map_parameters" name="map_parameters" action="#" accept-charset="utf-8" class="inlineForm"><select id="chapter-select" class="div-toggle" data-target=".my-info-1"></select></form><span class='introbreak'></span>
+        <div id="dropdown-instructions">
+          <p><b>Select your county of interest.</b></p>
+        </div>
+        <form id="map_parameters" name="map_parameters" action="#" accept-charset="utf-8" class="inlineForm"><select id="chapter-select" class="div-toggle" data-target=".my-info-1"></select></form>
+        <!-- Add a button to trigger the handleButtonClick() function -->
+        <div id="search-instructions">
+          <p><b>Click the search button.</b></p>
+        </div>
+        <button onclick="handleButtonClick()">Search</button>
+        <span class='introbreak'></span>
         <div id="sidebar-info" class="my-info-1">
           <div id="content-info" class="contentinfo hide"></div>
         </div>
@@ -237,12 +264,19 @@
     const chapterContent = [];
     // define an empty array to hold all counties with an ordinance
     const ordinanceCounties = [];
-    // define an empty array to hold the selected county
-    const chapterSelected = [];
     // define sidebar info
     const info = document.getElementById("content-info");
     // define an empty array to hold the counties
     const chapterNames = [];
+
+    // Declare the global variable to hold the "ordinances" layer
+    let ordinancesLayer;
+    // Declare the global variable to hold the "counties" layer
+    let countiesLayer; 
+    // Declare the global variable to hold the "litigation" layer
+    let litigationLayer;  
+    // Declare the global variable to hold the "pipelines" layer
+    let pipelinesLayer; 
 
     // add a basemap
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
@@ -285,7 +319,6 @@
 
     // Adjust the CSS styles of the legend
     const legendContainer = document.querySelector('.legend');
-    //legendContainer.style.paddingTop = '0px';
 
     // Load the data asynchronously
     d3.queue()
@@ -327,6 +360,9 @@
         }
       }).addTo(map);
 
+      // Assign the "iowaCounties" layer to the global variable
+      countiesLayer = iowaCounties;
+
       // create Leaflet object with geometry data and add to map
       const pipelineCounties = L.geoJson(counties, {
         // Function to filter results based on "pipeline" property
@@ -348,6 +384,9 @@
           layer.bindTooltip('<b>' + props.name + '</b>');
         }
       }).addTo(map);
+
+      // Assign the "pipelineCounties" layer to the global variable
+      pipelinesLayer = pipelineCounties;
 
       // create Leaflet object with geometry data and add to map
       const ordinances = L.geoJson(ords, {
@@ -388,6 +427,9 @@
         }
       });
 
+      // Assign the "ordinances" layer to the global variable
+      ordinancesLayer = ordinances;
+
       // create Leaflet object with geometry data and add to map
       const litigation = L.geoJson(lit, {
         style: function(feature, layer) {
@@ -403,7 +445,6 @@
           const props = layer.feature.properties;
           // initialize the tooltip variable
           let tooltip = '';
-
           // check if there is one or two litigation
           if (props.Litigation1 && props.Litigation2) {
             tooltip = props.Litigation1 + '<br>' + props.Litigation2;
@@ -414,6 +455,9 @@
           layer.bindTooltip('<b>' + props.name + '</b><br>Ongoing Litigation:<br>' + tooltip);
         }
       });
+
+      // Assign the "litigation" layer to the global variable
+      litigationLayer = litigation;      
 
       const navigatorPipeline = L.geoJson(nav, {
         style: function(feature) {
@@ -538,45 +582,118 @@
         wolfPipeline.bringToFront();
       });
 
-      $('#chapter-select')[0].onchange = function(e) {
-        filterOrdinances(ordinances);
-        filterCounties(iowaCounties)
-      };
+    }; // end drawMap function
 
-    } // end drawMap function
+    // Function to get the selected radio value
+    function getSelectedRadioValue() {
+        const radioButtons = document.getElementsByName('select');
+        let selectedRadioValue = null;
+        radioButtons.forEach(radio => {
+            if (radio.checked) {
+                selectedRadioValue = radio.value;
+            }
+        });
+        return selectedRadioValue;
+    };
 
-    function filterOrdinances(ordinances) {
+    // Function to get the selected value from the dropdown
+    function getSelectedDropdownValue() {
+        const dropdown = document.getElementById('chapter-select');
+        const selectedDropdownValue = dropdown.value;
+        return selectedDropdownValue;
+    };
+
+    // Function to get both the radio selection and the dropdown selection
+    function getSelections() {
+        const radioSelection = getSelectedRadioValue();
+        const dropdownSelection = getSelectedDropdownValue();
+        // You can use the values here, or return them as an object or an array
+        // For this example, I will return an object
+        return {
+            radio: radioSelection,
+            dropdown: dropdownSelection
+        };
+    };
+
+    // Example of using the function
+    function handleButtonClick() {
+        const selections = getSelections();
+        const radioSelection = selections.radio;
+        const dropdownSelection = selections.dropdown;
+        // Use the values for further processing here
+        if (radioSelection === 'ordinances') {
+          // Add the "ordinancesLayer" baselayer
+          ordinancesLayer.addTo(map);
+          // Remove the "litigationLayer" baselayer
+          map.removeLayer(litigationLayer);
+          // Remove the "pipelinesLayer" baselayer
+          map.removeLayer(pipelinesLayer);
+          filterOrdinances(ordinancesLayer, dropdownSelection);
+          filterCounties(countiesLayer, dropdownSelection);
+        } else if (radioSelection === 'litigation') {
+          // Add the "litigationLayer" baselayer
+          litigationLayer.addTo(map);
+          // Remove the "ordinancesLayer" baselayer
+          map.removeLayer(ordinancesLayer);
+          // Remove the "pipelinesLayer" baselayer
+          map.removeLayer(pipelinesLayer);
+          filterLitigation(litigationLayer, dropdownSelection);
+          filterCounties(countiesLayer, dropdownSelection);
+        };
+    };
+    
+    function filterLitigation(litigationLayer, dropdownSelection) {
       chapterContent.length = 0;
       ordinanceCounties.length = 0;
       info.innerHTML = chapterContent.join("");
-      chapterSelected.length = 0;
-      chapterSelected.push($('#chapter-select')[0].value);
-      ordinances.eachLayer(function(layer) {
+      litigationLayer.eachLayer(function(layer) {
         const props = layer.feature.properties;
         ordinanceCounties.push(props.county);
-        if (chapterSelected[0] == props.county) {
-          //selectedLayers.addLayer(layer);
+        if (dropdownSelection == props.county) {
+          chapterContent.push("<div class='story'><h2 class='about'>" + props.name + "</h2><br><h3 class='details'>" + props.Litigation1 + "<br>" + props.Litigation2 + "</h3></div>");
+          info.innerHTML = chapterContent;
+        }
+      });
+      if (ordinanceCounties.indexOf(dropdownSelection) === -1 && dropdownSelection != "0") {
+        chapterContent.push("<div class='story'><h2 class='about'>" + dropdownSelection + "</h2><br><h3 class='details'>The selected county has no litigation.</h3></div>");
+        info.innerHTML = chapterContent;
+      };
+      if (ordinanceCounties.indexOf(dropdownSelection) === -1 && dropdownSelection == "0") {
+        chapterContent.push("<div class='story'><h2 class='about'>Select a county</h2><br><h3 class='details'>Please select a county from the dropdown menu.</h3></div>");
+        info.innerHTML = chapterContent;
+      }
+    };
+
+    function filterOrdinances(ordinancesLayer, dropdownSelection) {
+      chapterContent.length = 0;
+      ordinanceCounties.length = 0;
+      info.innerHTML = chapterContent.join("");
+      ordinancesLayer.eachLayer(function(layer) {
+        const props = layer.feature.properties;
+        ordinanceCounties.push(props.county);
+        if (dropdownSelection == props.county) {
           chapterContent.push("<div class='story'><h2 class='about'>" + props.name + "</h2><br><h3 class='details'>" + props.Ordinance_Hyperlinks + "</h3></div>");
           info.innerHTML = chapterContent;
         }
       });
-      if (ordinanceCounties.indexOf(chapterSelected[0]) === -1) {
-        chapterContent.push("<div class='story'><h2 class='about'>" + chapterSelected[0] + "</h2><br><h3 class='details'>The selected county has no ordinance.</h3></div>");
+      if (ordinanceCounties.indexOf(dropdownSelection) === -1 && dropdownSelection != "0") {
+        chapterContent.push("<div class='story'><h2 class='about'>" + dropdownSelection + "</h2><br><h3 class='details'>The selected county has no ordinance.</h3></div>");
+        info.innerHTML = chapterContent;
+      };
+      if (ordinanceCounties.indexOf(dropdownSelection) === -1 && dropdownSelection == "0") {
+        chapterContent.push("<div class='story'><h2 class='about'>Select a county</h2><br><h3 class='details'>Please select a county from the dropdown menu.</h3></div>");
         info.innerHTML = chapterContent;
       };
     };
 
-    function filterCounties(iowaCounties) {
-      iowaCounties.eachLayer(function(layer) {
+    function filterCounties(countiesLayer, dropdownSelection) {
+      countiesLayer.eachLayer(function(layer) {
         const props = layer.feature.properties;
-        if (chapterSelected[0] == props.county) {
+        if (dropdownSelection == props.county) {
           // If chapterSelected[0] matches props.county, change the style of the layer
           layer.setStyle({
             weight: 5 // Set the weight to 2
           });
-          /*layer.bringToFront();
-          layer.bindPopup('<b>' + props.name + '</b>');
-          layer.openPopup();*/
           map.flyToBounds(layer.getBounds(), {
             animate: true,
             duration: 1 // You can adjust the animation duration as needed
@@ -587,9 +704,9 @@
           });
         };
       });
-      iowaCounties.on('mouseover', function (event) {
+      countiesLayer.on('mouseover', function (event) {
         // Set the initial style on mouseout
-        iowaCounties.setStyle({
+        countiesLayer.setStyle({
           weight: 1 // Set the weight to 1
         });
       });
