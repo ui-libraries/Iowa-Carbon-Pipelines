@@ -226,9 +226,13 @@
         <form id="map_parameters" name="map_parameters" action="#" accept-charset="utf-8" class="inlineForm"><select id="chapter-select" class="div-toggle" data-target=".my-info-1"></select></form>
         <!-- Add a button to trigger the handleButtonClick() function -->
         <div id="search-instructions">
-          <p><b>Click the search button.</b></p>
+          <p><b>Click the search button or zoom back to Iowa.</b></p>
         </div>
-        <button onclick="handleButtonClick()">Search</button>
+        <!-- Wrap the buttons in a container div to control their layout -->
+        <div class="button-container">
+          <button onclick="handleButtonClick()">Search</button>
+          <button onclick="handleZoomOutClick()">Zoom Out</button>
+        </div>        
         <span class='introbreak'></span>
         <div id="sidebar-info" class="my-info-1">
           <div id="content-info" class="contentinfo hide"></div>
@@ -277,6 +281,8 @@
     let litigationLayer;  
     // Declare the global variable to hold the "pipelines" layer
     let pipelinesLayer; 
+    // Declare the global variable to hold the "navigatorPipeline" layer
+    let navPipe;
 
     // add a basemap
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
@@ -490,6 +496,9 @@
         */
       }).addTo(map);
 
+      // Assign the "navigatorPipeline" layer to the global variable
+      navPipe = navigatorPipeline;         
+
       const summitPipeline = L.geoJson(summit, {
         style: function(feature) {
           return {
@@ -553,7 +562,7 @@
       }).addTo(map);
 
       // first set the zoom/center to the dataLayer's extent
-      map.fitBounds(iowaCounties.getBounds());
+      map.fitBounds(navigatorPipeline.getBounds());
 
       // Create an object with the overlay layers
       const overlayLayers = {
@@ -615,7 +624,7 @@
         };
     };
 
-    // Example of using the function
+    // Define the handleButtonClick() function
     function handleButtonClick() {
         const selections = getSelections();
         const radioSelection = selections.radio;
@@ -640,6 +649,12 @@
           filterLitigation(litigationLayer, dropdownSelection);
           filterCounties(countiesLayer, dropdownSelection);
         };
+    };
+
+    // Define the handleZoomOutClick() function
+    function handleZoomOutClick() {
+      // Perform the zoom-out operation using fitBounds()
+      map.fitBounds(navPipe.getBounds());
     };
     
     function filterLitigation(litigationLayer, dropdownSelection) {
