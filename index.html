@@ -140,6 +140,32 @@
       background-color: rgba(211, 211, 211, 0.5);
     }
 
+    /* lockup styles */
+    .sidebar-pane {
+      display: flex;
+      align-items: center;
+    }
+
+    .svg-container {
+      display: flex; /* Arrange logos horizontally */
+      max-height: 120px;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .svg-item {
+      flex: 0 0 auto; /* Prevent logos from growing or shrinking */
+      margin-right: -150px; /* Adjust the margin to control the spacing between logos */
+      margin-left: -160px;
+      margin-bottom: -40px;
+    }
+
+    /* For maintaining aspect ratio, set either width or height to "auto" */
+    .svg-item img {
+      width: 400px; /* Set the desired width for the SVG logo */
+      height: auto; /* Set height to "auto" for maintaining aspect ratio */
+    }
+
     /* custom sidebar css */
       /* sidebar header */
       .sidebar-header {
@@ -209,7 +235,7 @@
             <br>3.) With the ordinance layer on, you can click counties with ordinances on the map to open ordinance-related documents in new web browser tabs.
             <br>4.) You can also search for county ordinances or litigation using the dropdown menu in the sidebar. This will return a list at the bottom.
             <br>5.) You can collapse this sidebar by clicking the arrow icon in its upper right corner.</h4>
-            <br><h3 class="details">This application was developed by the <a href="https://www.lib.uiowa.edu/studio/" target="_blank">University of Iowa Libraries' Digital Scholarship & Publishing Studio</a>. The locations of the planned pipelines were digitized by researchers at the FracTracker Alliance and appear here courtesy of <a href="https://www.fractracker.org/author/ted-auch/" target="_blank">Dr. Ted Auch, the Midwest Program Director of the FracTracker Alliance</a>.</h3>
+            <br><h3 class="details">Research for this project was conducting by staff and research assistants of the <a href="https://heli.law.uiowa.edu/" target="_blank">Hubbell Environmental Law Initiative</a> at the University of Iowa College of law. With questions, concerns, or suggestions about the content on this map, please contact Blake Rupe at <a href="brupe@uiowa.edu" target="_blank">brupe@uiowa.edu</a>.  Are we missing something? Let us know: <a href="brupe@uiowa.edu" target="_blank">brupe@uiowa.edu</a>. This application was developed by the <a href="https://www.lib.uiowa.edu/studio/" target="_blank">University of Iowa Libraries' Digital Scholarship & Publishing Studio</a>. The locations of the planned pipelines were digitized by researchers at the FracTracker Alliance and appear here courtesy of <a href="https://www.fractracker.org/author/ted-auch/" target="_blank">Dr. Ted Auch, the Midwest Program Director of the FracTracker Alliance</a>.</h3>
           <p style="padding-bottom:0px"></p>
         </div>
         <div id="radio-select">
@@ -226,12 +252,38 @@
         <form id="map_parameters" name="map_parameters" action="#" accept-charset="utf-8" class="inlineForm"><select id="chapter-select" class="div-toggle" data-target=".my-info-1"></select></form>
         <!-- Add a button to trigger the handleButtonClick() function -->
         <div id="search-instructions">
-          <p><b>Click the search button.</b></p>
+          <p><b>Click the search button or zoom back to Iowa.</b></p>
         </div>
-        <button onclick="handleButtonClick()">Search</button>
+        <!-- Wrap the buttons in a container div to control their layout -->
+        <div class="button-container">
+          <button onclick="handleButtonClick()">Search</button>
+          <button onclick="handleZoomOutClick()">Zoom Out</button>
+        </div>
         <span class='introbreak'></span>
         <div id="sidebar-info" class="my-info-1">
           <div id="content-info" class="contentinfo hide"></div>
+        </div>
+        <br><hr><br>  
+        <div id="affiliates">
+          <p><b>University Affiliates:</b></p>
+        </div>        
+        <div class="svg-container">
+          <div class="svg-item">
+            <!-- SVG content for the first item -->
+            <img id="svg1" src="lockups/Heli.svg" alt="Item 1" />
+          </div>
+          <div class="svg-item">
+            <!-- SVG content for the second item -->
+            <img src="lockups/LawCollege.svg" alt="Item 2" />
+          </div>
+          <div class="svg-item">
+            <!-- SVG content for the third item -->
+            <img src="lockups/LawLibrary.svg" alt="Item 3" />
+          </div>
+          <div class="svg-item">
+            <!-- SVG content for the fourth item -->
+            <img src="lockups/Studio.svg" alt="Item 4" />
+          </div>
         </div>
       </div>
     </div>
@@ -277,6 +329,8 @@
     let litigationLayer;  
     // Declare the global variable to hold the "pipelines" layer
     let pipelinesLayer; 
+    // Declare the global variable to hold the "navigatorPipeline" layer
+    let navPipe;
 
     // add a basemap
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
@@ -490,6 +544,9 @@
         */
       }).addTo(map);
 
+      // Assign the "navigatorPipeline" layer to the global variable
+      navPipe = navigatorPipeline;  
+
       const summitPipeline = L.geoJson(summit, {
         style: function(feature) {
           return {
@@ -553,7 +610,7 @@
       }).addTo(map);
 
       // first set the zoom/center to the dataLayer's extent
-      map.fitBounds(iowaCounties.getBounds());
+      map.fitBounds(navPipe.getBounds());
 
       // Create an object with the overlay layers
       const overlayLayers = {
@@ -640,6 +697,12 @@
           filterLitigation(litigationLayer, dropdownSelection);
           filterCounties(countiesLayer, dropdownSelection);
         };
+    };
+
+    // Define the handleZoomOutClick() function
+    function handleZoomOutClick() {
+      // Perform the zoom-out operation using fitBounds()
+      map.fitBounds(navPipe.getBounds());
     };
     
     function filterLitigation(litigationLayer, dropdownSelection) {
