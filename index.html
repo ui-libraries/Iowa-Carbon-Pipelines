@@ -254,11 +254,7 @@
         <div id="search-instructions">
           <p><b>Click the search button or zoom back to Iowa.</b></p>
         </div>
-        <!-- Wrap the buttons in a container div to control their layout -->
-        <div class="button-container">
-          <button onclick="handleButtonClick()">Search</button>
-          <button onclick="handleZoomOutClick()">Zoom Out</button>
-        </div>
+        <button onclick="handleButtonClick()">Search</button>
         <span class='introbreak'></span>
         <div id="sidebar-info" class="my-info-1">
           <div id="content-info" class="contentinfo hide"></div>
@@ -544,9 +540,6 @@
         */
       }).addTo(map);
 
-      // Assign the "navigatorPipeline" layer to the global variable
-      navPipe = navigatorPipeline;  
-
       const summitPipeline = L.geoJson(summit, {
         style: function(feature) {
           return {
@@ -610,7 +603,7 @@
       }).addTo(map);
 
       // first set the zoom/center to the dataLayer's extent
-      map.fitBounds(navPipe.getBounds());
+      map.fitBounds(iowaCounties.getBounds());
 
       // Create an object with the overlay layers
       const overlayLayers = {
@@ -672,7 +665,7 @@
         };
     };
 
-    // Example of using the function
+    // Define the handleButtonClick() function
     function handleButtonClick() {
         const selections = getSelections();
         const radioSelection = selections.radio;
