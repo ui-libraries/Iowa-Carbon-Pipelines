@@ -500,13 +500,17 @@
           // initialize the tooltip variable
           let tooltip = '';
           // check if there is one or two litigation
-          if (props.Litigation1 && props.Litigation2) {
-            tooltip = props.Litigation1 + '<br>' + props.Litigation2;
-          } else if (props.Litigation1 && !props.Litigation2) {
-            tooltip = props.Litigation1;
+          if (props.Litigation1 && props.Litigation2 && props.Litigation3 && props.Litigation4) {
+            tooltip = '<ul><li>' + props.Litigation1 + '<li>' + props.Litigation2 + '<li>' + props.Litigation3 + '<li>' + props.Litigation4 + '</ul>';
+          } else if (props.Litigation1 && props.Litigation2 && props.Litigation3 && !props.Litigation4) {
+            tooltip = '<ul><li>' + props.Litigation1 + '<li>' + props.Litigation2 + '<li>' + props.Litigation3 + '</ul>';
+          } else if (props.Litigation1 && props.Litigation2 && !props.Litigation3 && !props.Litigation4) {
+            tooltip = '<ul><li>' + props.Litigation1 + '<li>' + props.Litigation2 + '</ul>';
+          } else if (props.Litigation1 && !props.Litigation2 && !props.Litigation3 && !props.Litigation4) {
+            tooltip = '<ul><li>' + props.Litigation1 + '</ul>';
           }
           // bind the tooltip to the layer
-          layer.bindTooltip('<b>' + props.name + '</b><br>Ongoing Litigation:<br>' + tooltip);
+          layer.bindTooltip('<b>' + props.name + '</b><br>Ongoing Litigation:' + tooltip);
         }
       });
 
@@ -713,7 +717,22 @@
         const props = layer.feature.properties;
         ordinanceCounties.push(props.county);
         if (dropdownSelection == props.county) {
-          chapterContent.push("<div class='story'><h2 class='about'>" + props.name + "</h2><br><h3 class='details'>" + props.Litigation1 + "<br>" + props.Litigation2 + "</h3></div>");
+          // Need to test which of the litigation columns have data...
+          console.log("Litigation 1: " + props.Litigation1);
+          console.log("Litigation 2: " + props.Litigation2);
+          console.log("Litigation 3: " + props.Litigation3);
+          console.log("Litigation 4: " + props.Litigation4);
+
+
+          if (props.Litigation1 && props.Litigation2 && props.Litigation3 && props.Litigation4) {
+            chapterContent.push("<div class='story'><h2 class='about'>" + props.name + "</h2><br><h3 class='details'><ul><li>" + props.Litigation1 + '<li>' + props.Litigation2 + '<li>' + props.Litigation3 + '<li>' + props.Litigation4 + '</ul></h3></div>');
+          } else if (props.Litigation1 && props.Litigation2 && props.Litigation3 && !props.Litigation4) {
+            chapterContent.push("<div class='story'><h2 class='about'>" + props.name + "</h2><br><h3 class='details'><ul><li>" + props.Litigation1 + '<li>' + props.Litigation2 + '<li>' + props.Litigation3 + '</ul></h3></div>');
+          } else if (props.Litigation1 && props.Litigation2 && !props.Litigation3 && !props.Litigation4) {
+            chapterContent.push("<div class='story'><h2 class='about'>" + props.name + "</h2><br><h3 class='details'><ul><li>" + props.Litigation1 + '<li>' + props.Litigation2 + '</ul></h3></div>');
+          } else if (props.Litigation1 && !props.Litigation2 && !props.Litigation3 && !props.Litigation4) {
+            chapterContent.push("<div class='story'><h2 class='about'>" + props.name + "</h2><br><h3 class='details'><ul><li>" + props.Litigation1 + '</ul></h3></div>');
+          }          
           info.innerHTML = chapterContent;
         }
       });
