@@ -738,12 +738,6 @@
         ordinanceCounties.push(props.county);
         if (dropdownSelection == props.county) {
           // Need to test which of the litigation columns have data...
-          console.log("Litigation 1: " + props.Litigation1);
-          console.log("Litigation 2: " + props.Litigation2);
-          console.log("Litigation 3: " + props.Litigation3);
-          console.log("Litigation 4: " + props.Litigation4);
-
-
           if (props.Litigation1 && props.Litigation2 && props.Litigation3 && props.Litigation4) {
             chapterContent.push("<div class='story'><h2 class='about'>" + props.name + "</h2><br><h3 class='details'><ul><li>" + props.Litigation1 + '<li>' + props.Litigation2 + '<li>' + props.Litigation3 + '<li>' + props.Litigation4 + '</ul></h3></div>');
           } else if (props.Litigation1 && props.Litigation2 && props.Litigation3 && !props.Litigation4) {
