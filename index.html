@@ -9,6 +9,10 @@
 
   <!-- link to Montserrat font -->
   <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+  <!-- link to Orpheus Pro Bold font -->
+  <link href="https://db.onlinewebfonts.com/c/81651a191b7129993b0871c834a19600?family=OrpheusPro-Bold" rel="stylesheet"> 
+  <!-- link to Twentieth Century font -->
+  <link href="https://db.onlinewebfonts.com/c/6138beb83221f6eb46ed08543a304d1d?family=Twentieth+Century" rel="stylesheet"> 
   <!-- leaflet css -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin="" />
   <!-- for the collapsible sidebar -->
@@ -170,6 +174,7 @@
       /* sidebar header */
       .sidebar-header {
         width: 100%;
+        font-family: "OrpheusPro-Bold"; 
       }
 
       /* sidebar icon */
@@ -177,17 +182,29 @@
         color: rgb(0, 0, 0);
       }
 
-      /* sidebar about heading*/
+      /* sidebar about heading */
       .about {
         color: rgb(0, 0, 0);
+        font-family: "OrpheusPro-Bold"; 
         font-size: 16px;
         margin-bottom: 0px;
         margin-top: 0px;
         margin-left: 0px;
       }
 
+      /* selection heading */
+      .choose {
+        color: rgb(0, 0, 0);
+        font-family: "OrpheusPro-Bold"; 
+        font-size: 16px;
+        margin-bottom: 0px;
+        margin-top: 0px;
+        margin-left: 0px;       
+      }
+
       /* map info */
       .details {
+        font-family: "Helvetica Neue";
         font-size: 13px;
         font-weight: normal;
         margin-bottom: 0px;
@@ -195,6 +212,7 @@
       }
 
       .instructions {
+        font-family: "Helvetica Neue";
         font-size: 12px;
         font-weight: normal;
         margin-bottom: 0px;
@@ -239,7 +257,7 @@
           <p style="padding-bottom:0px"></p>
         </div>
         <div id="radio-select">
-          <p><b>Choose from ordinances or litigation.</b></p>
+          <p><h2 class="choose">Choose from ordinances or litigation.</h2></p>
           <input type="radio" id="ordinances" name="select" value="ordinances" checked>
           <label for="ordinances">Ordinances</label><br>
 
@@ -247,12 +265,12 @@
           <label for="litigation">Litigation</label><br>
         </div>
         <div id="dropdown-instructions">
-          <p><b>Select your county of interest.</b></p>
+          <p><h2 class="choose">Select your county of interest.</h2></p>
         </div>
         <form id="map_parameters" name="map_parameters" action="#" accept-charset="utf-8" class="inlineForm"><select id="chapter-select" class="div-toggle" data-target=".my-info-1"></select></form>
         <!-- Add a button to trigger the handleButtonClick() function -->
         <div id="search-instructions">
-          <p><b>Click the search button or zoom back to Iowa.</b></p>
+          <p><h2 class="choose">Click the search button or zoom back to Iowa.</h2></p>
         </div>
         <!-- Wrap the buttons in a container div to control their layout -->
         <div class="button-container">
@@ -265,7 +283,7 @@
         </div>
         <br><hr><br>  
         <div id="affiliates">
-          <p><b>University Affiliates:</b></p>
+          <p><h2 class="choose">University Affiliates:</h2></p>
         </div>        
         <div class="svg-container">
           <div class="svg-item">
@@ -407,8 +425,10 @@
           chapterNames.sort();
           // define the dropdown content using each county name
           const eachChapter = chapterNames.filter((v, i, a) => a.indexOf(v) === i);
-          let tmpHTML = '<select><option value="0">Select a county</option>';
-          for (let csv = 0; csv < eachChapter.length; csv++) tmpHTML += '<option value="' + eachChapter[csv] + '">' + eachChapter[csv] + '</option>';
+          let tmpHTML = '<select class="custom-select"><option value="0">Select a county</option>';
+          for (let csv = 0; csv < eachChapter.length; csv++) {
+            tmpHTML += '<option value="' + eachChapter[csv] + '">' + eachChapter[csv] + '</option>';
+          }
           tmpHTML += '</select>';
           document.getElementById("chapter-select").innerHTML = tmpHTML;
         }
