@@ -250,7 +250,7 @@
           <h3 class="details">This map helps users locate Iowa counties impacted by planned carbon pipeline construction, ordinances, and litigation. Basic instructions are as follows:</h3>
             <br><h4 class="instructions">1.) In the upper right corner, use the layer control to switch to the layer showing which counties have enacted pipeline-related ordinances or litigation.
             <br>2.) You can also use this to filter the planned pipelines by company (Navigator, Summit, and Wolf).
-            <br>3.) With the ordinance layer on, you can click counties with ordinances on the map to open ordinance-related documents in new web browser tabs.
+            <br>3.) With the ordinance layer on, you can click counties with ordinances on the map to open ordinance-related documents in new web browser tabs. When more than one ordinance exists, you may need to set your browser preferences to allow popups for this page.
             <br>4.) You can also search for county ordinances or litigation using the dropdown menu in the sidebar. This will return a list at the bottom.
             <br>5.) You can collapse this sidebar by clicking the arrow icon in its upper right corner.</h4>
             <br><h3 class="details">Research for this project was conducting by staff and research assistants of the <a href="https://heli.law.uiowa.edu/" target="_blank">Hubbell Environmental Law Initiative</a> at the University of Iowa College of law. With questions, concerns, or suggestions about the content on this map, please contact Blake Rupe at <a href="brupe@uiowa.edu" target="_blank">brupe@uiowa.edu</a>.  Are we missing something? Let us know: <a href="brupe@uiowa.edu" target="_blank">brupe@uiowa.edu</a>. This application was developed by the <a href="https://www.lib.uiowa.edu/studio/" target="_blank">University of Iowa Libraries' Digital Scholarship & Publishing Studio</a>. The locations of the planned pipelines were digitized by researchers at the FracTracker Alliance and appear here courtesy of <a href="https://www.fractracker.org/author/ted-auch/" target="_blank">Dr. Ted Auch, the Midwest Program Director of the FracTracker Alliance</a>.</h3>
@@ -434,6 +434,9 @@
         }
       }).addTo(map);
 
+      // Define the modal element with id="myModal"
+      const modal = document.getElementById("myModal");
+
       // Assign the "iowaCounties" layer to the global variable
       countiesLayer = iowaCounties;
 
@@ -484,6 +487,7 @@
           if (props.url && props.url2) {
             // If both "url" and "url2" properties exist, add a click event listener to the layer
             layer.on('click', function() {
+              console.log("there are two urls.");
               const url = props.url;
               const url2 = props.url2;
               window.open(url, '_blank');
