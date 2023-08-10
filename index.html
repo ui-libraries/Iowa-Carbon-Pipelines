@@ -259,10 +259,13 @@
         <div id="radio-select">
           <p><h2 class="choose">Choose from ordinances or litigation.</h2></p>
           <input type="radio" id="ordinances" name="select" value="ordinances" checked>
-          <label for="ordinances">Ordinances</label><br>
+          <label for="ordinances">Pipeline Ordinances</label><br>
 
           <input type="radio" id="litigation" name="select" value="litigation">
           <label for="litigation">Litigation</label><br>
+
+          <input type="radio" id="utilityOrds" name="select" value="utilityOrds">
+          <label for="litigation">Utility Ordinances</label><br>
         </div>
         <div id="dropdown-instructions">
           <p><h2 class="choose">Select your county of interest.</h2></p>
@@ -490,7 +493,6 @@
           if (props.url && props.url2) {
             // If both "url" and "url2" properties exist, add a click event listener to the layer
             layer.on('click', function() {
-              console.log("there are two urls.");
               const url = props.url;
               const url2 = props.url2;
               window.open(url, '_blank');
@@ -551,10 +553,24 @@
             color: 'black',
             weight: 1,
             fillOpacity: 0.5,
-            fillColor: 'rgb(85, 107, 47)'
+            fillColor: 'rgb(85,107,47)'
           }
         },
-      }).addTo(map);
+        onEachFeature: function(feature, layer) {
+          // define the layer properties
+          const props = layer.feature.properties;
+          // bind a tooltip to the layer
+          layer.bindTooltip('<b>' + props.name + '</b><br>Click this county for details about the ordinance.');
+          // on click...
+          layer.on('click', function() {
+            const url = props.url;
+            window.open(url, '_blank');
+          });
+        }
+      });
+
+      // Assign the "utilityOrds" layer to the global variable
+      utilOrds = utilityOrds;
 
       const navigatorPipeline = L.geoJson(nav, {
         style: function(feature) {
@@ -666,7 +682,8 @@
       const baseLayers = {
         "Planned Pipeline Counties": pipelineCounties,
         "Pipeline Ordinances": ordinances,
-        "Litigation Initiated": litigation
+        "Litigation Initiated": litigation,
+        "Utility Ordinances": utilityOrds
       };
 
       // Add the layer control to the map
@@ -728,6 +745,8 @@
           map.removeLayer(litigationLayer);
           // Remove the "pipelinesLayer" baselayer
           map.removeLayer(pipelinesLayer);
+          // Remove the "utilOrds" baselayer
+          map.removeLayer(utilOrds);
           filterOrdinances(ordinancesLayer, dropdownSelection);
           filterCounties(countiesLayer, dropdownSelection);
         } else if (radioSelection === 'litigation') {
@@ -737,7 +756,20 @@
           map.removeLayer(ordinancesLayer);
           // Remove the "pipelinesLayer" baselayer
           map.removeLayer(pipelinesLayer);
+          // Remove the "utilOrds" baselayer
+          map.removeLayer(utilOrds);
           filterLitigation(litigationLayer, dropdownSelection);
+          filterCounties(countiesLayer, dropdownSelection);
+        } else if (radioSelection === 'utilityOrds') {
+          // Add the "utilOrds" baselayer
+          utilOrds.addTo(map);
+          // Remove the "ordinancesLayer" baselayer
+          map.removeLayer(ordinancesLayer);
+          // Remove the "litigationLayer" baselayer
+          map.removeLayer(litigationLayer);
+          // Remove the "pipelinesLayer" baselayer
+          map.removeLayer(pipelinesLayer);
+          filterUtilOrds(utilOrds, dropdownSelection);
           filterCounties(countiesLayer, dropdownSelection);
         };
     };
@@ -793,6 +825,28 @@
       });
       if (ordinanceCounties.indexOf(dropdownSelection) === -1 && dropdownSelection != "0") {
         chapterContent.push("<div class='story'><h2 class='about'>" + dropdownSelection + "</h2><br><h3 class='details'>The selected county has no ordinance.</h3></div>");
+        info.innerHTML = chapterContent;
+      };
+      if (ordinanceCounties.indexOf(dropdownSelection) === -1 && dropdownSelection == "0") {
+        chapterContent.push("<div class='story'><h2 class='about'>Select a county</h2><br><h3 class='details'>Please select a county from the dropdown menu.</h3></div>");
+        info.innerHTML = chapterContent;
+      };
+    };
+
+    function filterUtilOrds(utilOrds, dropdownSelection) {
+      chapterContent.length = 0;
+      ordinanceCounties.length = 0;
+      info.innerHTML = chapterContent.join("");
+      utilOrds.eachLayer(function(layer) {
+        const props = layer.feature.properties;
+        ordinanceCounties.push(props.county);
+        if (dropdownSelection == props.county) {
+          chapterContent.push("<div class='story'><h2 class='about'>" + props.name + "</h2><br><h3 class='details'>" + props.UtilityOrdinances + "</h3></div>");
+          info.innerHTML = chapterContent;
+        }
+      });
+      if (ordinanceCounties.indexOf(dropdownSelection) === -1 && dropdownSelection != "0") {
+        chapterContent.push("<div class='story'><h2 class='about'>" + dropdownSelection + "</h2><br><h3 class='details'>The selected county has no utility ordinance.</h3></div>");
         info.innerHTML = chapterContent;
       };
       if (ordinanceCounties.indexOf(dropdownSelection) === -1 && dropdownSelection == "0") {
