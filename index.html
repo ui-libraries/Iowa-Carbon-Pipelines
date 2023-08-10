@@ -11,8 +11,8 @@
   <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
   <!-- link to Orpheus Pro Bold font -->
   <link href="https://db.onlinewebfonts.com/c/81651a191b7129993b0871c834a19600?family=OrpheusPro-Bold" rel="stylesheet"> 
-  <!-- link to Twentieth Century font -->
-  <link href="https://db.onlinewebfonts.com/c/6138beb83221f6eb46ed08543a304d1d?family=Twentieth+Century" rel="stylesheet"> 
+  <!-- link to Poppins font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap" rel="stylesheet">  
   <!-- leaflet css -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin="" />
   <!-- for the collapsible sidebar -->
@@ -204,7 +204,7 @@
 
       /* map info */
       .details {
-        font-family: "Helvetica Neue";
+        font-family: 'Poppins', sans-serif;
         font-size: 13px;
         font-weight: normal;
         margin-bottom: 0px;
@@ -212,7 +212,7 @@
       }
 
       .instructions {
-        font-family: "Helvetica Neue";
+        font-family: 'Poppins', sans-serif;
         font-size: 12px;
         font-weight: normal;
         margin-bottom: 0px;
@@ -349,6 +349,8 @@
     let pipelinesLayer; 
     // Declare the global variable to hold the "navigatorPipeline" layer
     let navPipe;
+    // Declare the global variable to hold the "utilityOrdinances" layer
+    let utilOrds;
 
     // add a basemap
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
@@ -397,13 +399,14 @@
       .defer(d3.json, 'data/iowa-counties.geojson') //the Iowa Counties geojson file
       .defer(d3.json, 'data/pipeline-ordinances.geojson') //the county pipeline ordinances
       .defer(d3.json, 'data/pipeline-litigation.geojson') //the county pipeline litigation
+      .defer(d3.json, 'data/utility-ordinances.geojson') //the county utility ordinances
       .defer(d3.json, 'data/Navigator_CO2_Pipeline.geojson') //Navigator Pipeline
       .defer(d3.json, 'data/Summit_CO2_Pipeline.geojson') //Summit Pipeline
       .defer(d3.json, 'data/Wolf_CO2_Pipeline.geojson') //Wolf Pipeline
       .await(drawMap); //load the layers after the map loads
 
     // Provide instructions for making the map
-    function drawMap(err, counties, ords, lit, nav, summit, wolf) {
+    function drawMap(err, counties, ords, lit, utils, nav, summit, wolf) {
 
       // create Leaflet object with geometry data and add to map
       const iowaCounties = L.geoJson(counties, {
@@ -525,13 +528,13 @@
           let tooltip = '';
           // check if there is one or two litigation
           if (props.Litigation1 && props.Litigation2 && props.Litigation3 && props.Litigation4) {
-            tooltip = '<ul><li>' + props.Litigation1 + '<li>' + props.Litigation2 + '<li>' + props.Litigation3 + '<li>' + props.Litigation4 + '</ul>';
+            tooltip = '<ul><li><b>' + props.Litigation1 + '</b><br>' + props.LitigationDesc1 + '<li><b>' + props.Litigation2 + '</b><br>' + props.LitigationDesc2 + '<li><b>' + props.Litigation3 + '</b><br>' + props.LitigationDesc3 + '<li><b>' + props.Litigation4 + '</b><br>' + props.LitigationDesc4 + '</ul>';
           } else if (props.Litigation1 && props.Litigation2 && props.Litigation3 && !props.Litigation4) {
-            tooltip = '<ul><li>' + props.Litigation1 + '<li>' + props.Litigation2 + '<li>' + props.Litigation3 + '</ul>';
+            tooltip = '<ul><li><b>' + props.Litigation1 + '</b><br>' + props.LitigationDesc1 + '<li><b>' + props.Litigation2 + '</b><br>' + props.LitigationDesc2 + '<li><b>' + props.Litigation3 + '</b><br>' + props.LitigationDesc3 + '</ul>';
           } else if (props.Litigation1 && props.Litigation2 && !props.Litigation3 && !props.Litigation4) {
-            tooltip = '<ul><li>' + props.Litigation1 + '<li>' + props.Litigation2 + '</ul>';
+            tooltip = '<ul><li><b>' + props.Litigation1 + '</b><br>' + props.LitigationDesc1 + '<li><b>' + props.Litigation2 + '</b><br>' + props.LitigationDesc2 + '</ul>';
           } else if (props.Litigation1 && !props.Litigation2 && !props.Litigation3 && !props.Litigation4) {
-            tooltip = '<ul><li>' + props.Litigation1 + '</ul>';
+            tooltip = '<ul><li><b>' + props.Litigation1 + '</b><br>' + props.LitigationDesc1 + '</ul>';
           }
           // bind the tooltip to the layer
           layer.bindTooltip('<b>' + props.name + '</b><br>Ongoing Litigation:' + tooltip);
@@ -539,7 +542,19 @@
       });
 
       // Assign the "litigation" layer to the global variable
-      litigationLayer = litigation;      
+      litigationLayer = litigation;   
+      
+      // create Leaflet object with geometry data and add to map
+      const utilityOrds = L.geoJson(utils, {
+        style: function(feature, layer) {
+          return {
+            color: 'black',
+            weight: 1,
+            fillOpacity: 0.5,
+            fillColor: 'rgb(85, 107, 47)'
+          }
+        },
+      }).addTo(map);
 
       const navigatorPipeline = L.geoJson(nav, {
         style: function(feature) {
@@ -743,13 +758,13 @@
         if (dropdownSelection == props.county) {
           // Need to test which of the litigation columns have data...
           if (props.Litigation1 && props.Litigation2 && props.Litigation3 && props.Litigation4) {
-            chapterContent.push("<div class='story'><h2 class='about'>" + props.name + "</h2><br><h3 class='details'><ul><li>" + props.Litigation1 + '<li>' + props.Litigation2 + '<li>' + props.Litigation3 + '<li>' + props.Litigation4 + '</ul></h3></div>');
+            chapterContent.push("<div class='story'><h2 class='about'>" + props.name + "</h2><br><h3 class='details'><ul><li><b>" + props.Litigation1 + '</b><br>' + props.LitigationDesc1 + '<li><b>' + props.Litigation2 + '</b><br>' + props.LitigationDesc2 + '<li><b>' + props.Litigation3 + '</b><br>' + props.LitigationDesc3 + '<li><b>' + props.Litigation4 + '</b><br>' + props.LitigationDesc4 + '</ul></h3></div>');
           } else if (props.Litigation1 && props.Litigation2 && props.Litigation3 && !props.Litigation4) {
-            chapterContent.push("<div class='story'><h2 class='about'>" + props.name + "</h2><br><h3 class='details'><ul><li>" + props.Litigation1 + '<li>' + props.Litigation2 + '<li>' + props.Litigation3 + '</ul></h3></div>');
+            chapterContent.push("<div class='story'><h2 class='about'>" + props.name + "</h2><br><h3 class='details'><ul><li><b>" + props.Litigation1 + '</b><br>' + props.LitigationDesc1 + '<li><b>' + props.Litigation2 + '</b><br>' + props.LitigationDesc2 + '<li><b>' + props.Litigation3 + '</b><br>' + props.LitigationDesc3 + '</ul></h3></div>');
           } else if (props.Litigation1 && props.Litigation2 && !props.Litigation3 && !props.Litigation4) {
-            chapterContent.push("<div class='story'><h2 class='about'>" + props.name + "</h2><br><h3 class='details'><ul><li>" + props.Litigation1 + '<li>' + props.Litigation2 + '</ul></h3></div>');
+            chapterContent.push("<div class='story'><h2 class='about'>" + props.name + "</h2><br><h3 class='details'><ul><li><b>" + props.Litigation1 + '</b><br>' + props.LitigationDesc1 + '<li><b>' + props.Litigation2 + '</b><br>' + props.LitigationDesc2 + '</ul></h3></div>');
           } else if (props.Litigation1 && !props.Litigation2 && !props.Litigation3 && !props.Litigation4) {
-            chapterContent.push("<div class='story'><h2 class='about'>" + props.name + "</h2><br><h3 class='details'><ul><li>" + props.Litigation1 + '</ul></h3></div>');
+            chapterContent.push("<div class='story'><h2 class='about'>" + props.name + "</h2><br><h3 class='details'><ul><li><b>" + props.Litigation1 + '</b><br>' + props.LitigationDesc1 + '</ul></h3></div>');
           }          
           info.innerHTML = chapterContent;
         }
