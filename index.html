@@ -144,6 +144,22 @@
       background-color: rgba(211, 211, 211, 0.5);
     }
 
+    .overlay-item {
+        position: relative;
+        background-color: white;
+        width: 12px;
+        height: 12px;
+        margin-right: 5px;
+    }
+
+    .overlay-item-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+
     /* lockup styles */
     .sidebar-pane {
       display: flex;
@@ -261,11 +277,11 @@
           <input type="radio" id="ordinances" name="select" value="ordinances" checked>
           <label for="ordinances">Pipeline Ordinances</label><br>
 
-          <input type="radio" id="litigation" name="select" value="litigation">
-          <label for="litigation">Litigation</label><br>
-
           <input type="radio" id="utilityOrds" name="select" value="utilityOrds">
           <label for="litigation">Utility Ordinances</label><br>
+
+          <input type="radio" id="litigation" name="select" value="litigation">
+          <label for="litigation">Litigation Initiated</label><br>          
         </div>
         <div id="dropdown-instructions">
           <p><h2 class="choose">Select your county of interest.</h2></p>
@@ -378,17 +394,18 @@
 
     // Add the legend to the map
     legend.onAdd = function(map) {
-      var div = L.DomUtil.create('div', 'legend');
-      div.innerHTML += '<h4>Legend</h4>';
-      div.innerHTML += '<h5>Pipelines</h5>';
-      div.innerHTML += '<svg height="12" width="12"><line x1="0" y1="6" x2="12" y2="6" style="stroke:red; stroke-width:2" /></svg> Navigator<br>';
-      div.innerHTML += '<svg height="12" width="12"><line x1="0" y1="6" x2="12" y2="6" style="stroke:orange; stroke-width:2" /></svg> Summit<br>';
-      div.innerHTML += '<svg height="12" width="12"><line x1="0" y1="6" x2="12" y2="6" style="stroke:green; stroke-width:2" /></svg> Wolf<br>';
-      div.innerHTML += '<h5>Counties</h5>';
-      div.innerHTML += '<div class="square" style="background-color: rgba(135,206,235,1);"></div> Planned Pipeline Present<br>';
-      div.innerHTML += '<div class="square" style="background-color: rgba(201,190,119,1);"></div> Pipeline Ordinance Enacted<br>';
-      div.innerHTML += '<div class="square" style="background-color: rgba(253,209,4,1);"></div> Pipeline Litigation Initiated<br>';
-      return div;
+        var div = L.DomUtil.create('div', 'legend');
+        div.innerHTML += '<h4>Legend</h4>';
+        div.innerHTML += '<h5>Pipelines</h5>';
+        div.innerHTML += '<svg height="12" width="12"><line x1="0" y1="6" x2="12" y2="6" style="stroke:red; stroke-width:2" /></svg> Navigator<br>';
+        div.innerHTML += '<svg height="12" width="12"><line x1="0" y1="6" x2="12" y2="6" style="stroke:orange; stroke-width:2" /></svg> Summit<br>';
+        div.innerHTML += '<svg height="12" width="12"><line x1="0" y1="6" x2="12" y2="6" style="stroke:green; stroke-width:2" /></svg> Wolf<br>';
+        div.innerHTML += '<h5>Counties</h5>';
+        div.innerHTML += '<div class="overlay-item"><div class="overlay-item-overlay" style="background-color: rgba(135,206,235,0.5);"></div></div> Planned Pipeline Present<br>';
+        div.innerHTML += '<div class="overlay-item"><div class="overlay-item-overlay" style="background-color: rgba(201,190,119,0.5);"></div></div> Pipeline Ordinance Enacted<br>';
+        div.innerHTML += '<div class="overlay-item"><div class="overlay-item-overlay" style="background-color: rgba(85,107,47,0.5);"></div></div> Utility Ordinance Enacted<br>';
+        div.innerHTML += '<div class="overlay-item"><div class="overlay-item-overlay" style="background-color: rgba(253,209,4,0.5);"></div></div> Pipeline Litigation Initiated<br>';
+        return div;
     };
 
     // Add the legend control to the map
@@ -682,8 +699,8 @@
       const baseLayers = {
         "Planned Pipeline Counties": pipelineCounties,
         "Pipeline Ordinances": ordinances,
-        "Litigation Initiated": litigation,
-        "Utility Ordinances": utilityOrds
+        "Utility Ordinances": utilityOrds,
+        "Litigation Initiated": litigation
       };
 
       // Add the layer control to the map
