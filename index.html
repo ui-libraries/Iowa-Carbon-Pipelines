@@ -101,6 +101,25 @@
         display: inline-block;
     }
 
+    /* collapsible div css */
+    .header {
+      display: flex;
+      align-items: center;
+    }
+
+    #collapseButton {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+      color: #333;
+      margin-right: 10px; /* Add some spacing between the button and the h2 element */
+    }
+
+    #collapseButton .icon {
+      margin-right: 5px;
+    }
+
     /* lockup styles */
     .sidebar-pane {
       display: flex;
@@ -201,9 +220,13 @@
     <div class="sidebar-content">
       <div class="sidebar-pane" id="home">
         <h1 class="sidebar-header">Iowa Carbon Pipelines<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1><br>
-        <div><br><b>
+        <br>
+        <div class="header">
+          <button id="collapseButton"><span class="icon"><i class="fas fa-chevron-up"></i></span></button>
           <h2 class="about">About This Project</h2>
-        </b><br><br>
+        </div>
+        <div id="collapsibleContent">
+          </b><br>
           <h3 class="details">This map helps users locate Iowa counties impacted by planned carbon pipeline construction, ordinances, and litigation. Basic instructions are as follows:</h3>
             <br><h4 class="instructions">1.) In the upper right corner, use the layer control to switch to the layer showing which counties have enacted pipeline-related ordinances or litigation.
             <br>2.) You can also use this to filter the planned pipelines by company (Navigator, Summit, and Wolf).
@@ -292,6 +315,20 @@
     // add a sidebar to the map
     const sidebar = L.control.sidebar("sidebar").addTo(map);
     sidebar.open("home");
+
+    // code to collapse about content
+    const collapseButton = document.getElementById('collapseButton');
+    const collapsibleContent = document.getElementById('collapsibleContent');
+
+    collapseButton.addEventListener('click', function() {
+      if (collapsibleContent.style.display === 'none') {
+        collapsibleContent.style.display = 'block';
+        collapseButton.innerHTML = '<span class="icon"><i class="fas fa-chevron-up"></i></span>';
+      } else {
+        collapsibleContent.style.display = 'none';
+        collapseButton.innerHTML = '<span class="icon"><i class="fas fa-chevron-down"></i></span>';
+      }
+    });    
 
     // define an empty array to hold the sidebar selected content
     const chapterContent = [];
