@@ -4,4 +4,4 @@ Description: This map helps users locate Iowa counties impacted by planned carbo
 
 Project PI: Blake Rupe, Program Director, HELI, University of Iowa College of Law
 
-See the map [here](https://jebowe3.github.io/Iowa-Carbon-Pipelines/).
+See the map [here](https://ui-libraries.github.io/Iowa-Carbon-Pipelines/).
