@@ -228,7 +228,7 @@
         <div id="collapsibleContent">
           </b><br>
           <h3 class="details">This map helps users locate Iowa counties impacted by planned carbon pipeline construction, ordinances, and litigation. Basic instructions are as follows:</h3>
-            <br><h4 class="instructions">1.) In the upper right corner, use the layer control to switch to the layer showing which counties have enacted pipeline-related ordinances or litigation.
+            <br><h4 class="instructions">1.) In the upper right corner, use the layer control to switch to the layer showing which counties have enacted pipeline-related ordinances or litigation, or have news reported about pipeline proposals.
             <br>2.) You can also use this to filter the planned pipelines by company (Navigator, Summit, and Wolf).
             <br>3.) With the ordinance layer on, you can click counties with ordinances on the map to open ordinance-related documents in new web browser tabs. When more than one ordinance exists, you may need to set your browser preferences to allow popups for this page.
             <br>4.) You can also search for county ordinances or litigation using the dropdown menu in the sidebar. This will return a list at the bottom.
@@ -240,10 +240,10 @@
           <p><h2 class="choose">Choose from ordinances, litigation, or news.</h2></p>
           <input type="radio" id="ordinances" name="select" value="ordinances" checked>
           <label for="ordinances">Pipeline Ordinances</label><br>
-
+<!-- Take out for now
           <input type="radio" id="utilityOrds" name="select" value="utilityOrds">
           <label for="litigation">Utility Ordinances</label><br>
-
+ -->
           <input type="radio" id="litigation" name="select" value="litigation">
           <label for="litigation">Litigation Initiated</label><br>
           
@@ -726,7 +726,9 @@
       const baseLayers = {
         "Planned Pipeline Counties": pipelineCounties,
         "Pipeline Ordinances": ordinances,
-        "Utility Ordinances": utilityOrds,
+/* Take out for now
+        "Utility Ordinances": utilityOrds, 
+*/
         "Litigation Initiated": litigation,
         "News Reported": newsStories
       };
