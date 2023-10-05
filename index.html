@@ -604,7 +604,7 @@
             // Prevent event propagation
             L.DomEvent.stopPropagation(event);
             // Create an array of URLs to open
-            let urls = [props.url1, props.url2, props.url3, props.url4].filter(url => url);
+            let urls = [props.url1, props.url2, props.url3, props.url4, props.url5].filter(url => url);
             // Open URLs sequentially
             urls.forEach(url => {
               window.open(url, '_blank');
@@ -929,15 +929,18 @@
         const props = layer.feature.properties;
         ordinanceCounties.push(props.county);
         if (dropdownSelection == props.county) {
-          // Need to test which of the litigation columns have data...
-          if (props.News1 && props.News2 && props.News3 && props.News4) {
-            chapterContent.push("<div class='story'><h2 class='about'>" + props.name + "</h2><br><h3 class='details'><ul><li>" + props.News1 + '<br><li>' + props.News2 + '<br><li>' + props.News3 + '<br><li>' + props.News4 + "</ul></h3></div>");
-          } else if (props.News1 && props.News2 && props.News3 && !props.News4) {
-            chapterContent.push("<div class='story'><h2 class='about'>" + props.name + "</h2><br><h3 class='details'><ul><li>" + props.News1 + '<br><li>' + props.News2 + '<br><li>' + props.News3 + "</ul></h3></div>");
-          } else if (props.News1 && props.News2 && !props.News3 && !props.News4) {
-            chapterContent.push("<div class='story'><h2 class='about'>" + props.name + "</h2><br><h3 class='details'><ul><li>" + props.News1 + '<br><li>' + props.News2 + "</ul></h3></div>");
-          } else if (props.News1 && !props.News2 && !props.News3 && !props.News4) {
-            chapterContent.push("<div class='story'><h2 class='about'>" + props.name + "</h2><br><h3 class='details'><ul><li>" + props.News1 + "</ul></h3></div>");
+          console.log(props);
+          // Need to test which of the columns have data...
+          if (props.news1 && props.news2 && props.news3 && props.news4 && props.news5) {
+            chapterContent.push("<div class='story'><h2 class='about'>" + props.name + "</h2><br><h3 class='details'><ul><li>" + props.news1 + '<br><li>' + props.news2 + '<br><li>' + props.news3 + '<br><li>' + props.news4 + '<br><li>' + props.news5 + "</ul></h3></div>");
+          } else if (props.news1 && props.news2 && props.news3 && props.news4 && !props.news5) {
+            chapterContent.push("<div class='story'><h2 class='about'>" + props.name + "</h2><br><h3 class='details'><ul><li>" + props.news1 + '<br><li>' + props.news2 + '<br><li>' + props.news3 + '<br><li>' + props.news4 + "</ul></h3></div>");
+          } else if (props.news1 && props.news2 && props.news3 && !props.news4 && !props.news5) {
+            chapterContent.push("<div class='story'><h2 class='about'>" + props.name + "</h2><br><h3 class='details'><ul><li>" + props.news1 + '<br><li>' + props.news2 + '<br><li>' + props.news3 + "</ul></h3></div>");
+          } else if (props.news1 && props.news2 && !props.news3 && !props.news4 && !props.news5) {
+            chapterContent.push("<div class='story'><h2 class='about'>" + props.name + "</h2><br><h3 class='details'><ul><li>" + props.news1 + '<br><li>' + props.news2 + "</ul></h3></div>");
+          } else if (props.news1 && !props.news2 && !props.news3 && !props.news4 && !props.news5) {
+            chapterContent.push("<div class='story'><h2 class='about'>" + props.name + "</h2><br><h3 class='details'><ul><li>" + props.news1 + "</ul></h3></div>");
           }
           info.innerHTML = chapterContent;
         }
