@@ -13,11 +13,11 @@
   <!-- link to Montserrat font -->
   <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
   <!-- link to Orpheus Pro Bold font -->
-  <link href="https://db.onlinewebfonts.com/c/81651a191b7129993b0871c834a19600?family=OrpheusPro-Bold" rel="stylesheet"> 
-  <!-- link to Poppins font -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap" rel="stylesheet">  
-  <!-- leaflet css -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin="" />
+  <link href="https://db.onlinewebfonts.com/c/81651a191b7129993b0871c834a19600?family=OrpheusPro-Bold" rel="stylesheet">
+  <!-- link to Poppins font (weight 400; the previous 300 weight was too thin for small body text) -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400&display=swap" rel="stylesheet">
+  <!-- leaflet css (upgraded 1.7.1 -> 1.9.4) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha512-Zcn6bjR/8RZbLEpLIeOwNtzREBAJnUKESxces60Mpoj+2okopSAcSUIUOseddDm0cxnGQzxIR7vJgsLZbdLE3w==" crossorigin="" />
   <!-- for the collapsible sidebar -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" />
   <link rel="stylesheet" href="src/leaflet-sidebar.css" />
@@ -29,7 +29,44 @@
     html {
       margin: 0;
       padding: 0;
-      font: 10pt "Helvetica Neue", Arial, Helvetica, sans-serif;
+      font: 1rem/1.5 "Helvetica Neue", Arial, Helvetica, sans-serif;
+    }
+
+    /* Visually hidden but available to screen readers */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* Skip link: hidden until it receives keyboard focus */
+    .skip-link {
+      position: absolute;
+      top: -100px;
+      left: 8px;
+      z-index: 3000;
+      padding: 0.5rem 1rem;
+      background: #fff;
+      color: #000;
+      border: 2px solid #000;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+
+    .skip-link:focus {
+      top: 8px;
+    }
+
+    /* Visible keyboard focus for everything */
+    :focus-visible {
+      outline: 3px solid #005fcc;
+      outline-offset: 2px;
     }
 
     /* Set map parameters */
@@ -40,59 +77,57 @@
       top: 0px;
     }
 
-    h1 {
-      color: white;
-      font-size: 16px;
-      display: inline-block;
-      margin-top: 0.5em;
-      margin-bottom: 0.0em;
-      margin-left: 0.8em;
-      margin-right: 0;
-      font-weight: normal;
-      font-family: "Montserrat";
+    /* Focusable county shapes on the map */
+    path.leaflet-interactive:focus {
+      outline: 3px solid #005fcc;
     }
 
-    h2 {
-      font-size: 12px;
-      color: white;
-      display: inline-block;
-      margin-top: 0.25em;
-      margin-bottom: 0.0em;
-      margin-left: 1.0em;
-      margin-right: 0;
-      font-weight: normal;
-      font-family: "Montserrat";
-    }
-
-    h4 {
-      font-size: 16px;
-      margin: 4px;
-    }
-
-    h5 {
-      font-size: 13px;
-      margin: 4px;
-    }
-
-    /* Legend styles */
-    .legend,
-    .caseLegend {
-      padding: 6px 8px;
+    /* Legend styles (light panel so the pipeline line colors keep their contrast) */
+    .legend {
+      padding: 6px 10px;
       font-size: 1em;
-      background: rgba(75, 75, 75, 0.8);
-      color: whitesmoke;
+      background: rgba(255, 255, 255, 0.95);
+      color: #1a1a1a;
+      border: 1px solid #767676;
       box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
       border-radius: 5px;
-      width: 180px;
+      width: 190px;
+    }
+
+    .legend h2 {
+      font-size: 1rem;
+      margin: 4px;
+    }
+
+    .legend h3 {
+      font-size: 0.8125rem;
+      margin: 6px 4px 4px;
+    }
+
+    .legend ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .legend li {
+      margin: 3px 0;
+      line-height: 1.3;
+    }
+
+    .legend svg {
+      vertical-align: middle;
     }
 
     .overlay-item {
         position: relative;
         background-color: white;
+        border: 1px solid #000;
         width: 12px;
         height: 12px;
         margin-right: 5px;
         display: inline-block;
+        vertical-align: middle;
     }
 
     .overlay-item-overlay {
@@ -104,31 +139,22 @@
         display: inline-block;
     }
 
-    /* collapsible div css */
-    .header {
-      display: flex;
-      align-items: center;
-    }
-
+    /* collapsible "About" section */
     #collapseButton {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin: 0;
+      padding: 0.25rem 0;
       background: none;
       border: none;
       cursor: pointer;
-      font-size: 1rem;
-      color: #333;
-      margin-right: 10px; /* Add some spacing between the button and the h2 element */
-    }
-
-    #collapseButton .icon {
-      margin-right: 5px;
+      font: inherit;
+      color: inherit;
+      text-align: left;
     }
 
     /* lockup styles */
-    .sidebar-pane {
-      display: flex;
-      align-items: center;
-    }
-
     .svg-container {
       display: flex; /* Arrange logos horizontally */
       max-height: 120px;
@@ -153,7 +179,9 @@
       /* sidebar header */
       .sidebar-header {
         width: 100%;
-        font-family: "OrpheusPro-Bold"; 
+        font-family: "OrpheusPro-Bold", Georgia, serif;
+        font-weight: normal;
+        margin-bottom: 1em;
       }
 
       /* sidebar icon */
@@ -161,46 +189,123 @@
         color: rgb(0, 0, 0);
       }
 
-      /* sidebar about heading */
-      .about {
-        color: rgb(0, 0, 0);
-        font-family: "OrpheusPro-Bold"; 
-        font-size: 16px;
-        margin-bottom: 0px;
-        margin-top: 0px;
-        margin-left: 0px;
-      }
-
-      /* selection heading */
+      /* section headings in the sidebar (About, Choose..., Affiliates, county results) */
+      .about,
       .choose {
+        display: block;
         color: rgb(0, 0, 0);
-        font-family: "OrpheusPro-Bold"; 
-        font-size: 16px;
-        margin-bottom: 0px;
-        margin-top: 0px;
-        margin-left: 0px;       
+        font-family: "OrpheusPro-Bold", Georgia, serif;
+        font-size: 1rem;
+        font-weight: normal;
+        margin: 0.75em 0 0.25em;
       }
 
       /* map info */
       .details {
         font-family: 'Poppins', sans-serif;
-        font-size: 13px;
+        font-size: 0.9375rem;
         font-weight: normal;
-        margin-bottom: 0px;
-        margin-top: 0px;
+        margin: 0 0 1em;
+      }
+
+      ul.details,
+      .details ul {
+        padding-left: 1.25em;
       }
 
       .instructions {
         font-family: 'Poppins', sans-serif;
-        font-size: 12px;
+        font-size: 0.875rem;
         font-weight: normal;
-        margin-bottom: 0px;
-        margin-top: 0px;        
+        margin: 0 0 1em;
+        padding-left: 1.5em;
+      }
+
+      .instructions li {
+        margin-bottom: 0.5em;
+      }
+
+      /* form controls */
+      fieldset.radio-group {
+        border: 0;
+        margin: 0 0 1em;
+        padding: 0;
+        min-width: 0;
+      }
+
+      fieldset.radio-group legend {
+        padding: 0;
+      }
+
+      .radio-row {
+        margin: 0.25rem 0;
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.9375rem;
+      }
+
+      .radio-row input {
+        width: 1.1rem;
+        height: 1.1rem;
+        margin: 0 0.4rem 0 0;
+        vertical-align: middle;
+        accent-color: #003b8e;
+      }
+
+      .radio-row label {
+        display: inline-block;
+        padding: 0.2rem 0;
+        cursor: pointer;
+      }
+
+      #chapter-select {
+        display: block;
+        max-width: 100%;
+        min-height: 2.5rem;
+        margin: 0 0 1em;
+        padding: 0.4rem;
+        font: inherit;
+        font-size: 0.9375rem;
+        color: #000;
+        background: #fff;
+        border: 2px solid #333;
+        border-radius: 4px;
+      }
+
+      .help-text {
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.875rem;
+        margin: 0 0 0.5em;
+      }
+
+      .button-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+
+      .btn {
+        min-height: 2.5rem;
+        padding: 0.4rem 1rem;
+        font: inherit;
+        font-size: 0.9375rem;
+        color: #000;
+        background: #fff;
+        border: 2px solid #333;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .btn:hover {
+        background: #e6e6e6;
       }
 
       .introbreak {
         display: block;
         margin-bottom: 1em;
+      }
+
+      #sidebar hr {
+        margin: 1.25em 0;
       }
 
       /* set a max width for the tooltips */
@@ -216,104 +321,127 @@
         overflow-y: auto;
       }
 
+    /* Respect the user's reduced-motion preference */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+
   </style>
 
 </head>
 
 <body>
-<!--
-  <header>
-    <h1>Iowa CO2 Pipelines</h1><br>
-    <h2>Digital Scholarship & Publishing Studio, University of Iowa Libraries</h2>
-  </header>
--->
-  <div id="sidebar" class="sidebar collapsed">
+  <a class="skip-link" href="#map">Skip to map</a>
+
+  <noscript>
+    <p style="position:relative;z-index:3000;margin:0;padding:1rem;background:#fff;color:#000;">
+      This interactive map requires JavaScript. Please enable JavaScript in your browser to view it.
+    </p>
+  </noscript>
+
+  <aside id="sidebar" class="sidebar collapsed" aria-label="Project information and county search">
     <div class="sidebar-tabs">
-      <ul role="tablist">
-        <li><a href="#home" role="tab"><i class="fa fa-bars"></i></a></li>
+      <ul>
+        <li><a id="sidebar-toggle" href="#home" role="button" aria-controls="home" aria-expanded="false" aria-label="Open sidebar" title="Open sidebar"><i class="fa fa-bars" aria-hidden="true"></i></a></li>
       </ul>
     </div>
     <div class="sidebar-content">
       <div class="sidebar-pane" id="home">
-        <h1 class="sidebar-header">Iowa Carbon Pipelines<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1><br>
-        <br>
-        <div class="header">
-          <button id="collapseButton"><span class="icon"><i class="fas fa-chevron-up"></i></span></button>
-          <h2 class="about">About This Project</h2>
-        </div>
+        <h2 class="sidebar-header">Iowa Carbon Pipelines</h2>
+        <button type="button" class="sidebar-close" aria-label="Close sidebar" title="Close sidebar"><i class="fa fa-caret-left" aria-hidden="true"></i></button>
+
+        <h3 class="about">
+          <button id="collapseButton" type="button" aria-expanded="true" aria-controls="collapsibleContent">
+            <i id="collapseIcon" class="fas fa-chevron-up" aria-hidden="true"></i>
+            <span>About This Project</span>
+          </button>
+        </h3>
         <div id="collapsibleContent">
-          </b><br>
-          <h3 class="details">This map helps users locate Iowa counties impacted by planned carbon pipeline construction, ordinances, and litigation. Basic instructions are as follows:</h3>
-            <br><h4 class="instructions">1.) In the upper right corner, use the layer control to switch to the layer showing which counties have enacted pipeline-related ordinances or litigation, or have news reported about pipeline proposals.
-            <br>2.) You can also use this to filter the planned pipelines by company (Navigator, Summit, and Wolf).
-            <br>3.) With the ordinance layer on, you can click counties with ordinances on the map to open ordinance-related documents in new web browser tabs. When more than one ordinance exists, you may need to set your browser preferences to allow popups for this page.
-            <br>4.) You can also search for county ordinances or litigation using the dropdown menu in the sidebar. This will return a list at the bottom.
-            <br>5.) You can collapse this sidebar by clicking the arrow icon in its upper right corner.</h4>
-            <br><h3 class="details">Research for this project was conducting by staff and research assistants of the <a href="https://heli.law.uiowa.edu/" target="_blank">Hubbell Environmental Law Initiative</a> at the University of Iowa College of law. With questions, concerns, or suggestions about the content on this map, please contact Blake Rupe at <a href="brupe@uiowa.edu" target="_blank">brupe@uiowa.edu</a>.  Are we missing something? Let us know: <a href="brupe@uiowa.edu" target="_blank">brupe@uiowa.edu</a>. This application was developed by the <a href="https://www.lib.uiowa.edu/studio/" target="_blank">University of Iowa Libraries' Digital Scholarship & Publishing Studio</a>. The locations of the planned pipelines were digitized by researchers at the FracTracker Alliance and appear here courtesy of <a href="https://www.fractracker.org/author/ted-auch/" target="_blank">Dr. Ted Auch, the Midwest Program Director of the FracTracker Alliance</a>.</h3>
-          <p style="padding-bottom:0px"></p>
+          <p class="details">This map helps users locate Iowa counties impacted by planned carbon pipeline construction, ordinances, and litigation. Basic instructions are as follows:</p>
+          <ol class="instructions">
+            <li>Use the "Map layers" control in the upper right corner of the map to switch to the layer showing which counties have enacted pipeline-related ordinances or litigation, or have news reported about pipeline proposals.</li>
+            <li>You can also use this control to filter the planned pipelines by company (Navigator, Summit, and Wolf). Pipelines are drawn as a solid line (Navigator), a dashed line (Summit), and a dotted line (Wolf).</li>
+            <li>With the ordinance layer on, you can click or press Enter on counties with ordinances on the map to open ordinance-related documents in new web browser tabs. When more than one ordinance exists, you may need to set your browser preferences to allow popups for this page.</li>
+            <li>You can also search for county ordinances, litigation, or news using the county menu in the sidebar. The results appear at the bottom of the sidebar. This is the quickest option for keyboard and screen reader users.</li>
+            <li>You can collapse this sidebar with the "Close sidebar" button at its upper right corner.</li>
+            <li>Keyboard users: press Tab to move between controls. When the map has focus, use the arrow keys to pan and the plus and minus keys to zoom.</li>
+          </ol>
+          <p class="details">Research for this project was conducting by staff and research assistants of the <a href="https://heli.law.uiowa.edu/" target="_blank" rel="noopener noreferrer">Hubbell Environmental Law Initiative<span class="sr-only"> (opens in a new tab)</span></a> at the University of Iowa College of law. With questions, concerns, or suggestions about the content on this map, please contact Blake Rupe at <a href="mailto:brupe@uiowa.edu">brupe@uiowa.edu</a>.  Are we missing something? Let us know: <a href="mailto:brupe@uiowa.edu">brupe@uiowa.edu</a>. This application was developed by the <a href="https://www.lib.uiowa.edu/studio/" target="_blank" rel="noopener noreferrer">University of Iowa Libraries' Digital Scholarship &amp; Publishing Studio<span class="sr-only"> (opens in a new tab)</span></a>. The locations of the planned pipelines were digitized by researchers at the FracTracker Alliance and appear here courtesy of <a href="https://www.fractracker.org/author/ted-auch/" target="_blank" rel="noopener noreferrer">Dr. Ted Auch, the Midwest Program Director of the FracTracker Alliance<span class="sr-only"> (opens in a new tab)</span></a>.</p>
         </div>
-        <div id="radio-select">
-          <p><h2 class="choose">Choose from ordinances, litigation, or news.</h2></p>
-          <input type="radio" id="ordinances" name="select" value="ordinances" checked>
-          <label for="ordinances">Hazardous Pipeline Ordinances</label><br>
+
+        <form id="map_parameters" name="map_parameters" action="#" accept-charset="utf-8">
+          <fieldset class="radio-group" id="radio-select">
+            <legend class="choose">Choose from ordinances, litigation, or news.</legend>
+            <div class="radio-row">
+              <input type="radio" id="ordinances" name="select" value="ordinances" checked>
+              <label for="ordinances">Hazardous Pipeline Ordinances</label>
+            </div>
 <!-- Take out for now
-          <input type="radio" id="utilityOrds" name="select" value="utilityOrds">
-          <label for="litigation">Utility Ordinances</label><br>
+            <div class="radio-row">
+              <input type="radio" id="utilityOrds" name="select" value="utilityOrds">
+              <label for="utilityOrds">Utility Ordinances</label>
+            </div>
  -->
-          <input type="radio" id="litigation" name="select" value="litigation">
-          <label for="litigation">Litigation Initiated</label><br>
-          
-          <input type="radio" id="news" name="select" value="news">
-          <label for="news">News Reported</label><br>  
-        </div>
-        <div id="dropdown-instructions">
-          <p><h2 class="choose">Select your county of interest.</h2></p>
-        </div>
-        <form id="map_parameters" name="map_parameters" action="#" accept-charset="utf-8" class="inlineForm"><select id="chapter-select" class="div-toggle" data-target=".my-info-1"></select></form>
-        <!-- Add a button to trigger the handleButtonClick() function -->
-        <div id="search-instructions">
-          <p><h2 class="choose">Click the search button or zoom back to Iowa.</h2></p>
-        </div>
-        <!-- Wrap the buttons in a container div to control their layout -->
-        <div class="button-container">
-          <button onclick="handleButtonClick()">Search</button>
-          <button onclick="handleZoomOutClick()">Zoom Out</button>
-        </div>        
-        <span class='introbreak'></span>
-        <div id="sidebar-info" class="my-info-1">
+            <div class="radio-row">
+              <input type="radio" id="litigation" name="select" value="litigation">
+              <label for="litigation">Litigation Initiated</label>
+            </div>
+            <div class="radio-row">
+              <input type="radio" id="news" name="select" value="news">
+              <label for="news">News Reported</label>
+            </div>
+          </fieldset>
+
+          <label for="chapter-select" class="choose">Select your county of interest.</label>
+          <select id="chapter-select" name="county">
+            <option value="0">Select a county</option>
+          </select>
+
+          <p class="help-text" id="search-instructions">Click the search button or zoom back to Iowa.</p>
+          <div class="button-container">
+            <button type="submit" class="btn" id="searchButton">Search<span class="sr-only"> for the selected county</span></button>
+            <button type="button" class="btn" id="zoomOutButton">Zoom Out<span class="sr-only"> to all of Iowa</span></button>
+          </div>
+        </form>
+        <span class="introbreak"></span>
+
+        <section id="sidebar-info" class="my-info-1" aria-label="County search results" aria-live="polite">
           <div id="content-info" class="contentinfo hide"></div>
-        </div>
-        <br><hr><br>  
+        </section>
+        <hr>
         <div id="affiliates">
-          <p><h2 class="choose">University Affiliates:</h2></p>
-        </div>        
+          <h3 class="choose">University Affiliates</h3>
+        </div>
         <div class="svg-container">
           <div class="svg-item">
-            <!-- SVG content for the first item -->
-            <img id="svg1" src="lockups/Heli.svg" alt="Item 1" />
+            <img id="svg1" src="lockups/Heli.svg" alt="Hubbell Environmental Law Initiative" />
           </div>
           <div class="svg-item">
-            <!-- SVG content for the second item -->
-            <img src="lockups/LawCollege.svg" alt="Item 2" />
+            <img src="lockups/LawCollege.svg" alt="University of Iowa College of Law" />
           </div>
           <div class="svg-item">
-            <!-- SVG content for the third item -->
-            <img src="lockups/LawLibrary.svg" alt="Item 3" />
+            <img src="lockups/LawLibrary.svg" alt="University of Iowa Law Library" />
           </div>
           <div class="svg-item">
-            <!-- SVG content for the fourth item -->
-            <img src="lockups/Studio.svg" alt="Item 4" />
+            <img src="lockups/Studio.svg" alt="Digital Scholarship &amp; Publishing Studio, University of Iowa Libraries" />
           </div>
         </div>
       </div>
     </div>
-  </div>
+  </aside>
 
   <!-- map -->
-  <div id="map"></div>
+  <main id="main-content">
+    <h1 class="sr-only">Iowa CO2 Pipelines: interactive map</h1>
+    <div id="map"></div>
+  </main>
 
-  <!-- leaflet js -->
-  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
+  <!-- leaflet js (upgraded 1.7.1 -> 1.9.4) -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha512-BwHfrr4c9kmRkLw6iXFdzcdWV/PGkVgiIyIWLLlTSXzWQzxuSg4DiQUCpauz/EWjgk5TYQqX/kvn9pG1NpYfqg==" crossorigin=""></script>
   <!-- d3js -->
   <script src="https://d3js.org/d3.v4.min.js"></script>
   <!-- jQuery -->
@@ -326,47 +454,75 @@
   <script src="src/leaflet.activearea.js"></script>
   <!-- javascript below -->
   <script>
-    // initialize the map
-    const map = L.map('map');
+    // Respect the user's reduced-motion preference for map animations
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // initialize the map (the zoom control is re-added below so it has an explicit position)
+    const map = L.map('map', {
+      zoomControl: false,
+      zoomAnimation: !prefersReducedMotion,
+      fadeAnimation: !prefersReducedMotion,
+      markerZoomAnimation: !prefersReducedMotion
+    });
 
     // add a sidebar to the map
     const sidebar = L.control.sidebar("sidebar").addTo(map);
     sidebar.open("home");
 
-    // Define the sidebar element 
+    // Define the sidebar element
     const sidebarElement = document.getElementById('sidebar');
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    const sidebarClose = sidebarElement.querySelector('.sidebar-close');
 
-    // code to collapse about content
+    // ---- Sidebar accessibility ------------------------------------------------
+    // Keep aria-expanded and the toggle's accessible name in sync with the sidebar state.
+    // (The plugin toggles a "collapsed" class; collapsed content is hidden with CSS.)
+    function syncSidebarA11y() {
+      const collapsed = sidebarElement.classList.contains('collapsed');
+      const label = collapsed ? 'Open sidebar' : 'Close sidebar';
+      sidebarToggle.setAttribute('aria-expanded', String(!collapsed));
+      sidebarToggle.setAttribute('aria-label', label);
+      sidebarToggle.setAttribute('title', label);
+    }
+    new MutationObserver(syncSidebarA11y).observe(sidebarElement, { attributes: true, attributeFilter: ['class'] });
+    syncSidebarA11y();
+
+    // The toggle is a link styled as a button: make Space work like it does on a real button
+    sidebarToggle.addEventListener('keydown', function(e) {
+      if (e.key === ' ' || e.key === 'Spacebar') {
+        e.preventDefault();
+        sidebarToggle.click();
+      }
+    });
+
+    // When the sidebar closes, its close button becomes hidden, so hand focus to the toggle
+    sidebarClose.addEventListener('click', function() {
+      sidebarToggle.focus();
+    });
+
+    // ---- "About" disclosure ---------------------------------------------------
     const collapseButton = document.getElementById('collapseButton');
+    const collapseIcon = document.getElementById('collapseIcon');
     const collapsibleContent = document.getElementById('collapsibleContent');
 
     collapseButton.addEventListener('click', function() {
-      if (collapsibleContent.style.display === 'none') {
-        collapsibleContent.style.display = 'block';
-        collapseButton.innerHTML = '<span class="icon"><i class="fas fa-chevron-up"></i></span>';
-      } else {
-        collapsibleContent.style.display = 'none';
-        collapseButton.innerHTML = '<span class="icon"><i class="fas fa-chevron-down"></i></span>';
-      }
-    });    
+      const wasExpanded = collapseButton.getAttribute('aria-expanded') === 'true';
+      collapseButton.setAttribute('aria-expanded', String(!wasExpanded));
+      collapsibleContent.hidden = wasExpanded;
+      collapseIcon.className = wasExpanded ? 'fas fa-chevron-down' : 'fas fa-chevron-up';
+    });
 
-    // define an empty array to hold the sidebar selected content
-    const chapterContent = [];
-    // define an empty array to hold all counties with an ordinance
-    const ordinanceCounties = [];
     // define sidebar info
     const info = document.getElementById("content-info");
-    // define an empty array to hold the counties
-    const chapterNames = [];
 
     // Declare the global variable to hold the "ordinances" layer
     let ordinancesLayer;
     // Declare the global variable to hold the "counties" layer
-    let countiesLayer; 
+    let countiesLayer;
     // Declare the global variable to hold the "litigation" layer
-    let litigationLayer;  
+    let litigationLayer;
     // Declare the global variable to hold the "pipelines" layer
-    let pipelinesLayer; 
+    let pipelinesLayer;
     // Declare the global variable to hold the "navigatorPipeline" layer
     let navPipe;
     // Declare the global variable to hold the "utilityOrdinances" layer
@@ -374,16 +530,26 @@
     // Declare the global variable to hold the "news" layer
     let newsLayer;
 
-    // add a basemap
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-      subdomains: 'abcd',
+    // add a basemap (free OpenStreetMap standard tiles; replaces CARTO Positron)
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       maxZoom: 11,
       minZoom: 7
     }).addTo(map);
 
-    // Remove the default zoom control
-    map.zoomControl.remove();
+    // On-screen zoom buttons (they were removed before, which left mouse/touch/switch users
+    // without a zoom control). Placed top right because the sidebar covers the top left.
+    L.control.zoom({
+      position: 'topright'
+    }).addTo(map);
+
+    // Pipeline line styles. Color alone is not enough to tell the lines apart, so each
+    // also has its own dash pattern. Colors are darkened to reach 3:1 against the basemap.
+    const PIPELINE_STYLES = {
+      navigator: { name: 'Navigator Pipeline', color: '#b8330a', weight: 3, dashArray: null,    lineCap: 'butt',  desc: 'solid line' },
+      summit:    { name: 'Summit Pipeline',    color: '#5e3c99', weight: 3, dashArray: '10 6',  lineCap: 'butt',  desc: 'dashed line' },
+      wolf:      { name: 'Wolf Pipeline',      color: '#006d2c', weight: 3, dashArray: '2 6',   lineCap: 'round', desc: 'dotted line' }
+    };
 
     // Create a legend control
     const legend = L.control({
@@ -395,28 +561,48 @@
       position: 'bottomright'
     }).addTo(map);
 
+    // Build a legend line swatch
+    function lineSwatch(s) {
+      return '<svg width="28" height="12" aria-hidden="true" focusable="false"><line x1="0" y1="6" x2="28" y2="6" stroke="' + s.color + '" stroke-width="' + s.weight + '"' +
+        (s.dashArray ? ' stroke-dasharray="' + s.dashArray + '"' : '') + ' stroke-linecap="' + s.lineCap + '" /></svg>';
+    }
+
+    // Build a legend fill swatch
+    function fillSwatch(rgba) {
+      return '<span class="overlay-item" aria-hidden="true"><span class="overlay-item-overlay" style="background-color: ' + rgba + ';"></span></span>';
+    }
+
     // Add the legend to the map
     legend.onAdd = function(map) {
-        var div = L.DomUtil.create('div', 'legend');
-        div.innerHTML += '<h4>Legend</h4>';
-        div.innerHTML += '<h5>Pipelines</h5>';
-        div.innerHTML += '<svg height="12" width="12"><line x1="0" y1="6" x2="12" y2="6" style="stroke:red; stroke-width:2" /></svg> Navigator<br>';
-        div.innerHTML += '<svg height="12" width="12"><line x1="0" y1="6" x2="12" y2="6" style="stroke:orange; stroke-width:2" /></svg> Summit<br>';
-        div.innerHTML += '<svg height="12" width="12"><line x1="0" y1="6" x2="12" y2="6" style="stroke:green; stroke-width:2" /></svg> Wolf<br>';
-        div.innerHTML += '<h5>Counties</h5>';
-        div.innerHTML += '<div class="overlay-item"><div class="overlay-item-overlay" style="background-color: rgba(135,206,235,0.5);"></div></div> Planned Pipeline Present<br>';
-        div.innerHTML += '<div class="overlay-item"><div class="overlay-item-overlay" style="background-color: rgba(201,190,119,0.5);"></div></div> Pipeline Ordinance Enacted<br>';
-        //div.innerHTML += '<div class="overlay-item"><div class="overlay-item-overlay" style="background-color: rgba(85,107,47,0.5);"></div></div> Utility Ordinance Enacted<br>';
-        div.innerHTML += '<div class="overlay-item"><div class="overlay-item-overlay" style="background-color: rgba(253,209,4,0.5);"></div></div> Pipeline Litigation Initiated<br>';
-        div.innerHTML += '<div class="overlay-item"><div class="overlay-item-overlay" style="background-color: rgba(171,68,21,0.5);"></div></div> News Reported<br>';
+        const div = L.DomUtil.create('div', 'legend');
+        div.setAttribute('role', 'region');
+        div.setAttribute('aria-label', 'Map legend');
+        div.innerHTML =
+          '<h2>Legend</h2>' +
+          '<h3>Pipelines</h3>' +
+          '<ul>' +
+            '<li>' + lineSwatch(PIPELINE_STYLES.navigator) + ' Navigator (solid line)</li>' +
+            '<li>' + lineSwatch(PIPELINE_STYLES.summit) + ' Summit (dashed line)</li>' +
+            '<li>' + lineSwatch(PIPELINE_STYLES.wolf) + ' Wolf (dotted line)</li>' +
+          '</ul>' +
+          '<h3>Counties</h3>' +
+          '<ul>' +
+            '<li>' + fillSwatch('rgba(135,206,235,0.5)') + ' Planned Pipeline Present</li>' +
+            '<li>' + fillSwatch('rgba(201,190,119,0.5)') + ' Pipeline Ordinance Enacted</li>' +
+            //'<li>' + fillSwatch('rgba(85,107,47,0.5)') + ' Utility Ordinance Enacted</li>' +
+            '<li>' + fillSwatch('rgba(253,209,4,0.5)') + ' Pipeline Litigation Initiated</li>' +
+            '<li>' + fillSwatch('rgba(171,68,21,0.5)') + ' News Reported</li>' +
+          '</ul>';
         return div;
     };
 
     // Add the legend control to the map
     legend.addTo(map);
 
-    // Adjust the CSS styles of the legend
-    const legendContainer = document.querySelector('.legend');
+    // Show an error message in the live region if the data cannot be loaded
+    function showLoadError() {
+      info.innerHTML = '<p class="details">Sorry, the map data could not be loaded. Please reload the page or try again later.</p>';
+    }
 
     // Load the data asynchronously
     d3.queue()
@@ -430,8 +616,72 @@
       .defer(d3.json, 'data/Wolf_CO2_Pipeline.geojson') //Wolf Pipeline
       .await(drawMap); //load the layers after the map loads
 
+    // Open each non-empty URL in a new tab
+    function openUrls(urls) {
+      urls.filter(Boolean).forEach(function(url) {
+        window.open(url, '_blank', 'noopener');
+      });
+    }
+
+    // Build the HTML list of litigation items for a county (used by the map popup and the sidebar)
+    function litigationItems(props) {
+      let html = '';
+      for (let i = 1; i <= 5; i++) {
+        if (props['Litigation' + i]) {
+          html += '<li><b>' + props['Litigation' + i] + '</b><br>' + props['LitigationDesc' + i] + '</li>';
+        }
+      }
+      return html ? '<ul>' + html + '</ul>' : '';
+    }
+
+    // Make a county shape reachable and operable by keyboard.
+    // Leaflet vector shapes are not focusable by default. This gives each one a tab stop,
+    // a text label, Enter/Space activation, and a tooltip + thicker outline while focused.
+    function makeFeatureAccessible(layer, label, activate) {
+      layer.on('add', function() {
+        const el = layer.getElement && layer.getElement();
+        if (!el || el.dataset.a11y) return;
+        el.dataset.a11y = '1';
+        el.setAttribute('tabindex', '0');
+        el.setAttribute('role', 'button');
+        el.setAttribute('aria-label', label);
+        el.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+            e.preventDefault();
+            activate();
+          }
+        });
+        el.addEventListener('focus', function() {
+          layer.setStyle({ weight: 4 });
+          try { layer.openTooltip(); } catch (err) { /* tooltip is a nicety only */ }
+        });
+        el.addEventListener('blur', function() {
+          layer.setStyle({ weight: 1 });
+          layer.closeTooltip();
+        });
+      });
+    }
+
     // Provide instructions for making the map
     function drawMap(err, counties, ords, lit, utils, news, nav, summit, wolf) {
+
+      if (err) {
+        showLoadError();
+        return;
+      }
+
+      // Build the county dropdown once, from the unique, sorted county names
+      const countySelect = document.getElementById('chapter-select');
+      const countyNames = counties.features
+        .map(function(f) { return f.properties.county; })
+        .filter(function(v, i, a) { return v && a.indexOf(v) === i; })
+        .sort();
+      countyNames.forEach(function(name) {
+        const option = document.createElement('option');
+        option.value = name;
+        option.textContent = name;
+        countySelect.appendChild(option);
+      });
 
       // create Leaflet object with geometry data and add to map
       const iowaCounties = L.geoJson(counties, {
@@ -447,23 +697,8 @@
           const props = layer.feature.properties;
           // bind a tooltip to the layer
           layer.bindTooltip('<b>' + props.name + '</b>');
-          // push the county names to the chapterNames array
-          chapterNames.push(props.county);
-          // sort the counties alphabetically
-          chapterNames.sort();
-          // define the dropdown content using each county name
-          const eachChapter = chapterNames.filter((v, i, a) => a.indexOf(v) === i);
-          let tmpHTML = '<select class="custom-select"><option value="0">Select a county</option>';
-          for (let csv = 0; csv < eachChapter.length; csv++) {
-            tmpHTML += '<option value="' + eachChapter[csv] + '">' + eachChapter[csv] + '</option>';
-          }
-          tmpHTML += '</select>';
-          document.getElementById("chapter-select").innerHTML = tmpHTML;
         }
       }).addTo(map);
-
-      // Define the modal element with id="myModal"
-      const modal = document.getElementById("myModal");
 
       // Assign the "iowaCounties" layer to the global variable
       countiesLayer = iowaCounties;
@@ -510,37 +745,17 @@
         onEachFeature: function(feature, layer) {
           // define the layer properties
           const props = layer.feature.properties;
-          // bind a tooltip to the layer
-          layer.bindTooltip('<b>' + props.name + '</b><br>Click this county for details about the ordinance.');
-          layer.on('click', function() {
-            // Prevent event propagation
-            L.DomEvent.stopPropagation(event);
-            // Create an array of URLs to open
-            let urls = [props.url1, props.url2, props.url3, props.url4].filter(url => url);
-            // Open URLs sequentially
-            urls.forEach(url => {
-              window.open(url, '_blank');
-            });
-          });
-/*          
-          if (props.url && props.url2) {
-            // If both "url" and "url2" properties exist, add a click event listener to the layer
-            layer.on('click', function() {
-              let url = props.url;
-              let url2 = props.url2;
-              window.open(url, '_blank');
-              setTimeout(function() {
-                window.open(url2, '_blank');
-              }, 100);
-            });
-          } else if (props.url && !props.url2) {
-            // If only "url" property exists, add a click event listener to the layer
-            layer.on('click', function() {
-              const url = props.url;
-              window.open(url, '_blank');
-            });
+          const openOrdinances = function() {
+            openUrls([props.url1, props.url2, props.url3, props.url4]);
           };
-*/
+          // bind a tooltip to the layer
+          layer.bindTooltip('<b>' + props.name + '</b><br>Click or press Enter on this county to open the ordinance documents in new tabs.');
+          layer.on('click', function(e) {
+            // Prevent event propagation
+            L.DomEvent.stopPropagation(e);
+            openOrdinances();
+          });
+          makeFeatureAccessible(layer, props.name + ': pipeline ordinance. Press Enter to open the ordinance documents in new tabs.', openOrdinances);
         }
       });
 
@@ -560,32 +775,33 @@
         onEachFeature: function(feature, layer) {
           // define the layer properties
           const props = layer.feature.properties;
-          // initialize the tooltip variable
-          let tooltip = '';
-          // check if there is one or two litigation
-          if (props.Litigation1 && props.Litigation2 && props.Litigation3 && props.Litigation4 && props.Litigation5) {
-            tooltip = '<ul><li><b>' + props.Litigation1 + '</b><br>' + props.LitigationDesc1 + '<li><b>' + props.Litigation2 + '</b><br>' + props.LitigationDesc2 + '<li><b>' + props.Litigation3 + '</b><br>' + props.LitigationDesc3 + '<li><b>' + props.Litigation4 + '</b><br>' + props.LitigationDesc4 + '<li><b>' + props.Litigation5 + '</b><br>' + props.LitigationDesc5 + '</ul>';
-          } else if (props.Litigation1 && props.Litigation2 && props.Litigation3 && props.Litigation4 && !props.Litigation5) {
-            tooltip = '<ul><li><b>' + props.Litigation1 + '</b><br>' + props.LitigationDesc1 + '<li><b>' + props.Litigation2 + '</b><br>' + props.LitigationDesc2 + '<li><b>' + props.Litigation3 + '</b><br>' + props.LitigationDesc3 + '<li><b>' + props.Litigation4 + '</b><br>' + props.LitigationDesc4 + '</ul>';
-          } else if (props.Litigation1 && props.Litigation2 && props.Litigation3 && !props.Litigation4 && !props.Litigation5) {
-            tooltip = '<ul><li><b>' + props.Litigation1 + '</b><br>' + props.LitigationDesc1 + '<li><b>' + props.Litigation2 + '</b><br>' + props.LitigationDesc2 + '<li><b>' + props.Litigation3 + '</b><br>' + props.LitigationDesc3 + '</ul>';
-          } else if (props.Litigation1 && props.Litigation2 && !props.Litigation3 && !props.Litigation4 && !props.Litigation5) {
-            tooltip = '<ul><li><b>' + props.Litigation1 + '</b><br>' + props.LitigationDesc1 + '<li><b>' + props.Litigation2 + '</b><br>' + props.LitigationDesc2 + '</ul>';
-          } else if (props.Litigation1 && !props.Litigation2 && !props.Litigation3 && !props.Litigation4 && !props.Litigation5) {
-            tooltip = '<ul><li><b>' + props.Litigation1 + '</b><br>' + props.LitigationDesc1 + '</ul>';
-          }
-          // bind the tooltip to the layer
-          layer.bindPopup('<b>' + props.name + '</b><br>Ongoing Litigation:' + tooltip);
-          // open the popup on hover
+          // bind the popup to the layer
+          layer.bindPopup('<b>' + props.name + '</b><br>Ongoing Litigation:' + litigationItems(props));
+          // open the popup on hover (it stays open until closed, so it is not hover-only)
           layer.on('mouseover', function() {
             layer.openPopup();
+          });
+          // keyboard: open the popup and move focus into it so it is read out
+          makeFeatureAccessible(layer, props.name + ': litigation. Press Enter to open the litigation details.', function() {
+            layer.openPopup();
+            const popupEl = layer.getPopup() && layer.getPopup().getElement();
+            const content = popupEl && popupEl.querySelector('.leaflet-popup-content');
+            if (content) {
+              content.setAttribute('tabindex', '-1');
+              content.focus();
+            }
+          });
+          // when the popup closes, return keyboard focus to the county
+          layer.on('popupclose', function() {
+            const el = layer.getElement && layer.getElement();
+            if (el && (document.activeElement === document.body)) el.focus();
           });
         }
       });
 
       // Assign the "litigation" layer to the global variable
-      litigationLayer = litigation;   
-      
+      litigationLayer = litigation;
+
       // create Leaflet object with geometry data and add to map
       const utilityOrds = L.geoJson(utils, {
         style: function(feature, layer) {
@@ -599,13 +815,14 @@
         onEachFeature: function(feature, layer) {
           // define the layer properties
           const props = layer.feature.properties;
+          const openUtility = function() {
+            openUrls([props.url]);
+          };
           // bind a tooltip to the layer
-          layer.bindTooltip('<b>' + props.name + '</b><br>Click this county for details about the ordinance.');
+          layer.bindTooltip('<b>' + props.name + '</b><br>Click or press Enter on this county to open the ordinance in a new tab.');
           // on click...
-          layer.on('click', function() {
-            let url = props.url;
-            window.open(url, '_blank');
-          });
+          layer.on('click', openUtility);
+          makeFeatureAccessible(layer, props.name + ': utility ordinance. Press Enter to open it in a new tab.', openUtility);
         }
       });
 
@@ -624,118 +841,47 @@
         },
         onEachFeature: function(feature, layer) {
           const props = feature.properties;
-          layer.bindTooltip('<b>' + props.name + '</b><br>Click this county to open the news links.');
-          layer.on('click', function(event) {
+          const openNews = function() {
+            openUrls([props.url1, props.url2, props.url3, props.url4, props.url5]);
+          };
+          layer.bindTooltip('<b>' + props.name + '</b><br>Click or press Enter on this county to open the news links in new tabs.');
+          layer.on('click', function(e) {
             // Prevent event propagation
-            L.DomEvent.stopPropagation(event);
-            // Create an array of URLs to open
-            let urls = [props.url1, props.url2, props.url3, props.url4, props.url5].filter(url => url);
-            // Open URLs sequentially
-            urls.forEach(url => {
-              window.open(url, '_blank');
-            });
+            L.DomEvent.stopPropagation(e);
+            openNews();
           });
+          makeFeatureAccessible(layer, props.name + ': news reported. Press Enter to open the news links in new tabs.', openNews);
         }
       });
 
       // Assign the "newsStories" layer to the global variable
       newsLayer = newsStories;
 
-      const navigatorPipeline = L.geoJson(nav, {
-        style: function(feature) {
-          return {
-            color: 'red',
-            weight: 2
-          };
-        },
-        /*
-                onEachFeature: function(feature, layer) {
-                  // define the layer properties
-                  const props = layer.feature.properties;
-                  // bind a tooltip to the layer
-                  layer.bindTooltip('<b>'+props.Name+'</b>', { sticky: true }).openTooltip();
-                  //define what happens on mouseover
-                  layer.on("mouseover", function(e) {
-                    e.target.setStyle({
-                      color: 'yellow',
-                      weight: 3
-                    });
-                  });
-                  //define what happens on mouseout
-                  layer.on("mouseout", function(e) {
-                    e.target.setStyle({
-                      color: 'red',
-                      weight: 2
-                    });
-                  });
-                }
-        */
-      }).addTo(map);
+      // Draw a pipeline with its own color + dash pattern and a hover tooltip naming it
+      function drawPipeline(data, s) {
+        return L.geoJson(data, {
+          style: function(feature) {
+            return {
+              color: s.color,
+              weight: s.weight,
+              dashArray: s.dashArray,
+              lineCap: s.lineCap
+            };
+          },
+          onEachFeature: function(feature, layer) {
+            layer.bindTooltip('<b>' + s.name + '</b>', { sticky: true });
+          }
+        }).addTo(map);
+      }
+
+      const navigatorPipeline = drawPipeline(nav, PIPELINE_STYLES.navigator);
 
       // Assign the "navigatorPipeline" layer to the global variable
-      navPipe = navigatorPipeline;         
+      navPipe = navigatorPipeline;
 
-      const summitPipeline = L.geoJson(summit, {
-        style: function(feature) {
-          return {
-            color: 'orange',
-            weight: 2
-          };
-        },
-        /*
-                onEachFeature: function(feature, layer) {
-                  // define the layer properties
-                  const props = layer.feature.properties;
-                  // bind a tooltip to the layer
-                  layer.bindTooltip('<b>'+props.Name+'</b>', { sticky: true }).openTooltip();
-                  //define what happens on mouseover
-                  layer.on("mouseover", function(e) {
-                    e.target.setStyle({
-                      color: 'yellow',
-                      weight: 3
-                    });
-                  });
-                  //define what happens on mouseout
-                  layer.on("mouseout", function(e) {
-                    e.target.setStyle({
-                      color: 'orange',
-                      weight: 2
-                    });
-                  });
-                }
-        */
-      }).addTo(map);
+      const summitPipeline = drawPipeline(summit, PIPELINE_STYLES.summit);
 
-      const wolfPipeline = L.geoJson(wolf, {
-        style: function(feature) {
-          return {
-            color: 'green',
-            weight: 2
-          };
-        },
-        /*
-                onEachFeature: function(feature, layer) {
-                  // define the layer properties
-                  const props = layer.feature.properties;
-                  // bind a tooltip to the layer
-                  layer.bindTooltip('<b>Wolf Carbon Pipeline</b>', { sticky: true }).openTooltip();
-                  //define what happens on mouseover
-                  layer.on("mouseover", function(e) {
-                    e.target.setStyle({
-                      color: 'yellow',
-                      weight: 3
-                    });
-                  });
-                  //define what happens on mouseout
-                  layer.on("mouseout", function(e) {
-                    e.target.setStyle({
-                      color: 'green',
-                      weight: 2
-                    });
-                  });
-                }
-        */
-      }).addTo(map);
+      const wolfPipeline = drawPipeline(wolf, PIPELINE_STYLES.wolf);
 
       // first set the zoom/center to the dataLayer's extent
       map.fitBounds(navPipe.getBounds());
@@ -752,7 +898,7 @@
         "Planned Pipeline Counties": pipelineCounties,
         "Hazardous Pipeline Ordinances": ordinances,
 /* Take out for now
-        "Utility Ordinances": utilityOrds, 
+        "Utility Ordinances": utilOrds,
 */
         "Litigation Initiated": litigation,
         "News Reported": newsStories
@@ -760,6 +906,10 @@
 
       // Add the layer control to the map
       const layerControl = L.control.layers(baseLayers, overlayLayers, { position: 'topright', collapsed: false }).addTo(map);
+
+      // Give the layer control a group name so screen readers announce what it is
+      layerControl.getContainer().setAttribute('role', 'group');
+      layerControl.getContainer().setAttribute('aria-label', 'Map layers');
 
       // Prevent zooming when clicking on the layer control
       L.DomEvent.disableClickPropagation(layerControl.getContainer());
@@ -769,7 +919,7 @@
         navigatorPipeline.bringToFront();
         summitPipeline.bringToFront();
         wolfPipeline.bringToFront();
-      });     
+      });
 
     }; // end drawMap function
 
@@ -796,16 +946,26 @@
     function getSelections() {
         const radioSelection = getSelectedRadioValue();
         const dropdownSelection = getSelectedDropdownValue();
-        // You can use the values here, or return them as an object or an array
-        // For this example, I will return an object
         return {
             radio: radioSelection,
             dropdown: dropdownSelection
         };
     };
 
+    // Search form: Enter in the county menu or the Search button both submit the form
+    document.getElementById('map_parameters').addEventListener('submit', function(e) {
+      e.preventDefault();
+      handleButtonClick();
+    });
+
+    document.getElementById('zoomOutButton').addEventListener('click', function() {
+      handleZoomOutClick();
+    });
+
     // Define the handleButtonClick() function
     function handleButtonClick() {
+      // The data may not have loaded (or failed to load)
+      if (!countiesLayer) return;
       adjustMapBounds(map, sidebarElement)
         const selections = getSelections();
         const radioSelection = selections.radio;
@@ -870,135 +1030,85 @@
 
     // Define the handleZoomOutClick() function
     function handleZoomOutClick() {
+      if (!navPipe) return;
       // Perform the zoom-out operation using fitBounds()
-      map.fitBounds(navPipe.getBounds());
+      map.fitBounds(navPipe.getBounds(), { animate: !prefersReducedMotion });
     };
-    
-    function filterLitigation(litigationLayer, dropdownSelection) {
-      chapterContent.length = 0;
-      ordinanceCounties.length = 0;
-      info.innerHTML = chapterContent.join("");
-      litigationLayer.eachLayer(function(layer) {
-        const props = layer.feature.properties;
-        ordinanceCounties.push(props.county);
-        if (dropdownSelection == props.county) {
-          // Need to test which of the litigation columns have data...
-          if (props.Litigation1 && props.Litigation2 && props.Litigation3 && props.Litigation4 && props.Litigation5) {
-            chapterContent.push("<div class='story'><h2 class='about'>" + props.name + "</h2><br><h3 class='details'><ul><li><b>" + props.Litigation1 + '</b><br>' + props.LitigationDesc1 + '<li><b>' + props.Litigation2 + '</b><br>' + props.LitigationDesc2 + '<li><b>' + props.Litigation3 + '</b><br>' + props.LitigationDesc3 + '<li><b>' + props.Litigation4 + '</b><br>' + props.LitigationDesc4 + '<li><b>' + props.Litigation5 + '</b><br>' + props.LitigationDesc5 + '</ul></h3></div>');
-          } else if (props.Litigation1 && props.Litigation2 && props.Litigation3 && props.Litigation4) {
-            chapterContent.push("<div class='story'><h2 class='about'>" + props.name + "</h2><br><h3 class='details'><ul><li><b>" + props.Litigation1 + '</b><br>' + props.LitigationDesc1 + '<li><b>' + props.Litigation2 + '</b><br>' + props.LitigationDesc2 + '<li><b>' + props.Litigation3 + '</b><br>' + props.LitigationDesc3 + '<li><b>' + props.Litigation4 + '</b><br>' + props.LitigationDesc4 + '</ul></h3></div>');
-          } else if (props.Litigation1 && props.Litigation2 && props.Litigation3 && !props.Litigation4) {
-            chapterContent.push("<div class='story'><h2 class='about'>" + props.name + "</h2><br><h3 class='details'><ul><li><b>" + props.Litigation1 + '</b><br>' + props.LitigationDesc1 + '<li><b>' + props.Litigation2 + '</b><br>' + props.LitigationDesc2 + '<li><b>' + props.Litigation3 + '</b><br>' + props.LitigationDesc3 + '</ul></h3></div>');
-          } else if (props.Litigation1 && props.Litigation2 && !props.Litigation3 && !props.Litigation4) {
-            chapterContent.push("<div class='story'><h2 class='about'>" + props.name + "</h2><br><h3 class='details'><ul><li><b>" + props.Litigation1 + '</b><br>' + props.LitigationDesc1 + '<li><b>' + props.Litigation2 + '</b><br>' + props.LitigationDesc2 + '</ul></h3></div>');
-          } else if (props.Litigation1 && !props.Litigation2 && !props.Litigation3 && !props.Litigation4) {
-            chapterContent.push("<div class='story'><h2 class='about'>" + props.name + "</h2><br><h3 class='details'><ul><li><b>" + props.Litigation1 + '</b><br>' + props.LitigationDesc1 + '</ul></h3></div>');
-          }          
-          info.innerHTML = chapterContent;
+
+    // ---- Search results (sidebar) ---------------------------------------------
+
+    // Links that open in a new tab get rel="noopener noreferrer" and a screen-reader warning
+    function enhanceLinks(container) {
+      container.querySelectorAll('a[target="_blank"]').forEach(function(a) {
+        a.setAttribute('rel', 'noopener noreferrer');
+        if (!a.querySelector('.sr-only')) {
+          a.insertAdjacentHTML('beforeend', '<span class="sr-only"> (opens in a new tab)</span>');
         }
       });
-      if (ordinanceCounties.indexOf(dropdownSelection) === -1 && dropdownSelection != "0") {
-        chapterContent.push("<div class='story'><h2 class='about'>" + dropdownSelection + "</h2><br><h3 class='details'>The selected county has no litigation.</h3></div>");
-        info.innerHTML = chapterContent;
-      };
-      if (ordinanceCounties.indexOf(dropdownSelection) === -1 && dropdownSelection == "0") {
-        chapterContent.push("<div class='story'><h2 class='about'>Select a county</h2><br><h3 class='details'>Please select a county from the dropdown menu.</h3></div>");
-        info.innerHTML = chapterContent;
+    }
+
+    // One result block: a heading plus its body
+    function countyBlock(name, bodyHtml) {
+      return "<div class='story'><h3 class='about'>" + name + "</h3>" + bodyHtml + "</div>";
+    }
+
+    // Shared renderer for the ordinance / litigation / news / utility searches.
+    //   buildBody(props)  -> HTML for a matching county (or '' if it has nothing to show)
+    //   noneMessage       -> text shown when the selected county is not in this layer
+    function renderCountyResult(layerGroup, dropdownSelection, buildBody, noneMessage) {
+      let found = false;
+      let html = '';
+      layerGroup.eachLayer(function(layer) {
+        const props = layer.feature.properties;
+        if (dropdownSelection == props.county) {
+          const body = buildBody(props);
+          if (body) {
+            html += countyBlock(props.name, body);
+            found = true;
+          }
+        }
+      });
+      if (!found) {
+        if (dropdownSelection != "0") {
+          html = countyBlock(dropdownSelection, "<p class='details'>" + noneMessage + "</p>");
+        } else {
+          html = countyBlock("Select a county", "<p class='details'>Please select a county from the dropdown menu.</p>");
+        }
       }
+      info.innerHTML = html;
+      enhanceLinks(info);
+    };
+
+    function filterLitigation(litigationLayer, dropdownSelection) {
+      renderCountyResult(litigationLayer, dropdownSelection, function(props) {
+        const items = litigationItems(props);
+        return items ? items.replace('<ul>', "<ul class='details'>") : '';
+      }, 'The selected county has no litigation.');
     };
 
     function filterOrdinances(ordinancesLayer, dropdownSelection) {
-      chapterContent.length = 0;
-      ordinanceCounties.length = 0;
-      info.innerHTML = chapterContent.join("");
-      ordinancesLayer.eachLayer(function(layer) {
-        const props = layer.feature.properties;
-        ordinanceCounties.push(props.county);
-        if (dropdownSelection == props.county) {
-          chapterContent.push("<div class='story'><h2 class='about'>" + props.name + "</h2><br><h3 class='details'>" + props.Ordinance_Hyperlinks + "</h3></div>");
-          info.innerHTML = chapterContent;
-        }
-      });
-      if (ordinanceCounties.indexOf(dropdownSelection) === -1 && dropdownSelection != "0") {
-        chapterContent.push("<div class='story'><h2 class='about'>" + dropdownSelection + "</h2><br><h3 class='details'>The selected county has no ordinance.</h3></div>");
-        info.innerHTML = chapterContent;
-      };
-      if (ordinanceCounties.indexOf(dropdownSelection) === -1 && dropdownSelection == "0") {
-        chapterContent.push("<div class='story'><h2 class='about'>Select a county</h2><br><h3 class='details'>Please select a county from the dropdown menu.</h3></div>");
-        info.innerHTML = chapterContent;
-      };
+      renderCountyResult(ordinancesLayer, dropdownSelection, function(props) {
+        return props.Ordinance_Hyperlinks ? "<div class='details'>" + props.Ordinance_Hyperlinks + "</div>" : '';
+      }, 'The selected county has no ordinance.');
     };
 
     function filterUtilOrds(utilOrds, dropdownSelection) {
-      chapterContent.length = 0;
-      ordinanceCounties.length = 0;
-      info.innerHTML = chapterContent.join("");
-      utilOrds.eachLayer(function(layer) {
-        const props = layer.feature.properties;
-        ordinanceCounties.push(props.county);
-        if (dropdownSelection == props.county) {
-          chapterContent.push("<div class='story'><h2 class='about'>" + props.name + "</h2><br><h3 class='details'>" + props.UtilityOrdinances + "</h3></div>");
-          info.innerHTML = chapterContent;
-        }
-      });
-      if (ordinanceCounties.indexOf(dropdownSelection) === -1 && dropdownSelection != "0") {
-        chapterContent.push("<div class='story'><h2 class='about'>" + dropdownSelection + "</h2><br><h3 class='details'>The selected county has no utility ordinance.</h3></div>");
-        info.innerHTML = chapterContent;
-      };
-      if (ordinanceCounties.indexOf(dropdownSelection) === -1 && dropdownSelection == "0") {
-        chapterContent.push("<div class='story'><h2 class='about'>Select a county</h2><br><h3 class='details'>Please select a county from the dropdown menu.</h3></div>");
-        info.innerHTML = chapterContent;
-      };
+      renderCountyResult(utilOrds, dropdownSelection, function(props) {
+        return props.UtilityOrdinances ? "<div class='details'>" + props.UtilityOrdinances + "</div>" : '';
+      }, 'The selected county has no utility ordinance.');
     };
 
     function filterNews(newsLayer, dropdownSelection) {
-      chapterContent.length = 0;
-      ordinanceCounties.length = 0;
-      info.innerHTML = chapterContent.join("");
-      newsLayer.eachLayer(function(layer) {
-        const props = layer.feature.properties;
-        ordinanceCounties.push(props.county);
-        if (dropdownSelection == props.county) {
-          // Need to test which of the columns have data...
-          // Test up to 13 news columns
-          if (props.news1 && props.news2 && props.news3 && props.news4 && props.news5 && props.news6 && props.news7 && props.news8 && props.news9 && props.news10 && props.news11 && props.news12 && props.news13) {
-            chapterContent.push("<div class='story'><h2 class='about'>" + props.name + "</h2><br><h3 class='details'><ul><li>" + props.news1 + '<br><li>' + props.news2 + '<br><li>' + props.news3 + '<br><li>' + props.news4 + '<br><li>' + props.news5 + '<br><li>' + props.news6 + '<br><li>' + props.news7 + '<br><li>' + props.news8 + '<br><li>' + props.news9 + '<br><li>' + props.news10 + '<br><li>' + props.news11 + '<br><li>' + props.news12 + '<br><li>' + props.news13 + "</ul></h3></div>");
-          } else if (props.news1 && props.news2 && props.news3 && props.news4 && props.news5 && props.news6 && props.news7 && props.news8 && props.news9 && props.news10 && props.news11 && props.news12 && !props.news13) {
-            chapterContent.push("<div class='story'><h2 class='about'>" + props.name + "</h2><br><h3 class='details'><ul><li>" + props.news1 + '<br><li>' + props.news2 + '<br><li>' + props.news3 + '<br><li>' + props.news4 + '<br><li>' + props.news5 + '<br><li>' + props.news6 + '<br><li>' + props.news7 + '<br><li>' + props.news8 + '<br><li>' + props.news9 + '<br><li>' + props.news10 + '<br><li>' + props.news11 + '<br><li>' + props.news12 + "</ul></h3></div>");
-          } else if (props.news1 && props.news2 && props.news3 && props.news4 && props.news5 && props.news6 && props.news7 && props.news8 && props.news9 && props.news10 && props.news11 && !props.news12 && !props.news13) {
-            chapterContent.push("<div class='story'><h2 class='about'>" + props.name + "</h2><br><h3 class='details'><ul><li>" + props.news1 + '<br><li>' + props.news2 + '<br><li>' + props.news3 + '<br><li>' + props.news4 + '<br><li>' + props.news5 + '<br><li>' + props.news6 + '<br><li>' + props.news7 + '<br><li>' + props.news8 + '<br><li>' + props.news9 + '<br><li>' + props.news10 + '<br><li>' + props.news11 + "</ul></h3></div>");
-          } else if (props.news1 && props.news2 && props.news3 && props.news4 && props.news5 && props.news6 && props.news7 && props.news8 && props.news9 && props.news10 && !props.news11 && !props.news12 && !props.news13) {
-            chapterContent.push("<div class='story'><h2 class='about'>" + props.name + "</h2><br><h3 class='details'><ul><li>" + props.news1 + '<br><li>' + props.news2 + '<br><li>' + props.news3 + '<br><li>' + props.news4 + '<br><li>' + props.news5 + '<br><li>' + props.news6 + '<br><li>' + props.news7 + '<br><li>' + props.news8 + '<br><li>' + props.news9 + '<br><li>' + props.news10 + "</ul></h3></div>");
-          } else if (props.news1 && props.news2 && props.news3 && props.news4 && props.news5 && props.news6 && props.news7 && props.news8 && props.news9 && !props.news10 && !props.news11 && !props.news12 && !props.news13) {
-            chapterContent.push("<div class='story'><h2 class='about'>" + props.name + "</h2><br><h3 class='details'><ul><li>" + props.news1 + '<br><li>' + props.news2 + '<br><li>' + props.news3 + '<br><li>' + props.news4 + '<br><li>' + props.news5 + '<br><li>' + props.news6 + '<br><li>' + props.news7 + '<br><li>' + props.news8 + '<br><li>' + props.news9 + "</ul></h3></div>");
-          } else if (props.news1 && props.news2 && props.news3 && props.news4 && props.news5 && props.news6 && props.news7 && props.news8 && !props.news9 && !props.news10 && !props.news11 && !props.news12 && !props.news13) {
-            chapterContent.push("<div class='story'><h2 class='about'>" + props.name + "</h2><br><h3 class='details'><ul><li>" + props.news1 + '<br><li>' + props.news2 + '<br><li>' + props.news3 + '<br><li>' + props.news4 + '<br><li>' + props.news5 + '<br><li>' + props.news6 + '<br><li>' + props.news7 + '<br><li>' + props.news8 + "</ul></h3></div>");
-          } else if (props.news1 && props.news2 && props.news3 && props.news4 && props.news5 && props.news6 && props.news7 && !props.news8 && !props.news9 && !props.news10 && !props.news11 && !props.news12 && !props.news13) {
-            chapterContent.push("<div class='story'><h2 class='about'>" + props.name + "</h2><br><h3 class='details'><ul><li>" + props.news1 + '<br><li>' + props.news2 + '<br><li>' + props.news3 + '<br><li>' + props.news4 + '<br><li>' + props.news5 + '<br><li>' + props.news6 + '<br><li>' + props.news7 + "</ul></h3></div>");
-          } else if (props.news1 && props.news2 && props.news3 && props.news4 && props.news5 && props.news6 && !props.news7 && !props.news8 && !props.news9 && !props.news10 && !props.news11 && !props.news12 && !props.news13) {
-            chapterContent.push("<div class='story'><h2 class='about'>" + props.name + "</h2><br><h3 class='details'><ul><li>" + props.news1 + '<br><li>' + props.news2 + '<br><li>' + props.news3 + '<br><li>' + props.news4 + '<br><li>' + props.news5 + '<br><li>' + props.news6 + "</ul></h3></div>");
-          } else if (props.news1 && props.news2 && props.news3 && props.news4 && props.news5 && !props.news6 && !props.news7 && !props.news8 && !props.news9 && !props.news10 && !props.news11 && !props.news12 && !props.news13) {
-            chapterContent.push("<div class='story'><h2 class='about'>" + props.name + "</h2><br><h3 class='details'><ul><li>" + props.news1 + '<br><li>' + props.news2 + '<br><li>' + props.news3 + '<br><li>' + props.news4 + '<br><li>' + props.news5 + "</ul></h3></div>");
-          } else if (props.news1 && props.news2 && props.news3 && props.news4 && !props.news5 && !props.news6 && !props.news7 && !props.news8 && !props.news9 && !props.news10 && !props.news11 && !props.news12 && !props.news13) {
-            chapterContent.push("<div class='story'><h2 class='about'>" + props.name + "</h2><br><h3 class='details'><ul><li>" + props.news1 + '<br><li>' + props.news2 + '<br><li>' + props.news3 + '<br><li>' + props.news4 + "</ul></h3></div>");
-          } else if (props.news1 && props.news2 && props.news3 && !props.news4 && !props.news5 && !props.news6 && !props.news7 && !props.news8 && !props.news9 && !props.news10 && !props.news11 && !props.news12 && !props.news13) {
-            chapterContent.push("<div class='story'><h2 class='about'>" + props.name + "</h2><br><h3 class='details'><ul><li>" + props.news1 + '<br><li>' + props.news2 + '<br><li>' + props.news3 + "</ul></h3></div>");
-          } else if (props.news1 && props.news2 && !props.news3 && !props.news4 && !props.news5 && !props.news6 && !props.news7 && !props.news8 && !props.news9 && !props.news10 && !props.news11 && !props.news12 && !props.news13) {
-            chapterContent.push("<div class='story'><h2 class='about'>" + props.name + "</h2><br><h3 class='details'><ul><li>" + props.news1 + '<br><li>' + props.news2 + "</ul></h3></div>");
-          } else if (props.news1 && !props.news2 && !props.news3 && !props.news4 && !props.news5 && !props.news6 && !props.news7 && !props.news8 && !props.news9 && !props.news10 && !props.news11 && !props.news12 && !props.news13) {
-            chapterContent.push("<div class='story'><h2 class='about'>" + props.name + "</h2><br><h3 class='details'><ul><li>" + props.news1 + "</ul></h3></div>");
+      renderCountyResult(newsLayer, dropdownSelection, function(props) {
+        // up to 13 news columns (news1 ... news13)
+        let items = '';
+        for (let i = 1; i <= 13; i++) {
+          if (props['news' + i]) {
+            items += '<li>' + props['news' + i] + '</li>';
           }
-          info.innerHTML = chapterContent;
         }
-      });
-      if (ordinanceCounties.indexOf(dropdownSelection) === -1 && dropdownSelection != "0") {
-        chapterContent.push("<div class='story'><h2 class='about'>" + dropdownSelection + "</h2><br><h3 class='details'>The selected county has no news.</h3></div>");
-        info.innerHTML = chapterContent;
-      };
-      if (ordinanceCounties.indexOf(dropdownSelection) === -1 && dropdownSelection == "0") {
-        chapterContent.push("<div class='story'><h2 class='about'>Select a county</h2><br><h3 class='details'>Please select a county from the dropdown menu.</h3></div>");
-        info.innerHTML = chapterContent;
-      };
+        return items ? "<ul class='details'>" + items + "</ul>" : '';
+      }, 'The selected county has no news.');
     };
 
     function filterCounties(countiesLayer, dropdownSelection) {
@@ -1010,7 +1120,7 @@
             weight: 5 // Set the weight to 2
           });
           map.flyToBounds(layer.getBounds(), {
-            animate: true,
+            animate: !prefersReducedMotion,
             duration: 1 // You can adjust the animation duration as needed
           });
         } else {

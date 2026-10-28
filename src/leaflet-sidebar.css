@@ -60,7 +60,7 @@
           color: #000;
           background-color: #eee; }
         .sidebar-tabs > li.active, .sidebar-tabs > ul > li.active {
-          color: #fff;
+          color: #000;
           background-color: #d9d9c7; }
         .sidebar-tabs > li.disabled, .sidebar-tabs > ul > li.disabled {
           color: rgba(51, 51, 51, 0.4); }
@@ -93,7 +93,12 @@
       left: 0;
       right: 40px; }
     .sidebar.collapsed > .sidebar-content {
-      overflow-y: hidden; }
+      overflow-y: hidden;
+      /* Collapsed content is only clipped by the plugin, not removed, so it stayed
+         keyboard-focusable and readable by screen readers. visibility:hidden takes it
+         out of both; the delay lets the 500ms collapse animation finish first. */
+      visibility: hidden;
+      transition: visibility 0s linear 500ms; }
 
   .sidebar-pane {
     display: none;
@@ -131,7 +136,17 @@
     width: 40px;
     height: 40px;
     text-align: center;
-    cursor: pointer; }
+    cursor: pointer;
+    /* now a <button>: reset native button styling */
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    line-height: 40px;
+    color: #000; }
+    .sidebar-close:hover {
+      background-color: #eee; }
     .sidebar-left .sidebar-close {
       right: 0; }
     .sidebar-right .sidebar-close {
@@ -199,3 +214,20 @@
   @media (min-width: 768px) {
     .sidebar-right.collapsed ~ .sidebar-map .leaflet-right {
       right: 50px; } }
+
+  /* Visible keyboard focus (WCAG 2.4.7). Negative offset keeps the ring inside
+     the overflow:hidden sidebar so it is not clipped. */
+  .sidebar-tabs a:focus-visible,
+  .sidebar-close:focus-visible {
+    outline: 3px solid #005fcc;
+    outline-offset: -3px; }
+
+  /* Respect the user's reduced-motion preference (WCAG 2.3.3) */
+  @media (prefers-reduced-motion: reduce) {
+    .sidebar,
+    .sidebar-tabs > li,
+    .sidebar-tabs > ul > li,
+    .sidebar-left ~ .sidebar-map .leaflet-left,
+    .sidebar-right ~ .sidebar-map .leaflet-right,
+    .sidebar.collapsed > .sidebar-content {
+      transition: none; } }
